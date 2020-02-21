@@ -25,11 +25,13 @@ class Game:
         # print(q_table2.size)
         # print(q_table2.shape)
         self.q_table2[:, :, :2, 4:] = -float('inf') #!Magdi!#
-        ue.print_string("Constructor")
+        ue.print_string("Q_Table Class : Constructor")
 
 
     def intialize_states(self, cur_old_e_o_hp_dist):
-    
+
+
+        ue.print_string(f"Iterator :=> {self.iterator}, Epislon :=> {self.epsilon}")
         if self.iterator == self.episodes:
             return -1
     
@@ -68,11 +70,11 @@ class Game:
         self.calc_reward(new_state, old_state)
         action = self.take_action(new_state[0], new_state[1], new_state[2])
         
-        if c_e_health == 0 or c_p_health == 0:
-            self.iterator += 1
+        #if c_e_health == -5 or c_p_health == -5:
+        #    self.iterator += 1
 
-        if self.iterator > self.decay_from:
-            self.epsilon *= self.eps_decay
+        #if self.iterator > self.decay_from:
+        #    self.epsilon *= self.eps_decay
         
         return action
 
@@ -80,11 +82,17 @@ class Game:
         index_state = (p_health, e_health, d_stance)
         #action = np.argmax(self.q_table2[index_state])
         if np.random.random() > self.epsilon:
+            ue.print_string("Take Max Q_Value")
             action = np.argmax(self.q_table2[index_state])
-            print(action)
         else:
+            ue.print_string("Explore: Random Action")
             action = np.random.randint(0, 6)
         return action
+
+    def next_iterator_epsilon(self):
+        self.iterator += 1
+        if self.iterator > self.decay_from:
+            self.epsilon *= self.eps_decay
 
     def calc_reward(self, current_state, old_state):
         reward = (old_state[1] - current_state[1]) - (old_state[0] - current_state[0])
