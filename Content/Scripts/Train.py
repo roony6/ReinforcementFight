@@ -22,7 +22,6 @@ class Game:
         # print(q_table2.size)
         # print(q_table2.shape)
         self.q_table2[:, :, 0:2, 4:6] = -float('inf') #!Magdi!#
-        ue.print_string("Lol_construct")
 
 
     def intialize_states(self, cur_old_e_o_hp_dist):
@@ -64,12 +63,12 @@ class Game:
 
     def take_action(self, p_health, e_health, d_stance):
         index_state = (p_health, e_health, d_stance)
-        action = np.argmax(self.q_table2[index_state])
-        '''if np.random.random() > self.epsilon:
+        #action = np.argmax(self.q_table2[index_state])
+        if np.random.random() > self.epsilon:
             action = np.argmax(self.q_table2[index_state])
             print(action)
         else:
-            action = np.random.randint(0, 6)'''
+            action = np.random.randint(0, 6)
         return action
 
     def calc_reward(self, current_state, old_state):
