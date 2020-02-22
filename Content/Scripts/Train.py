@@ -1,6 +1,6 @@
 import numpy as np
 import unreal_engine as ue
-
+import pickle
 
 class Game:
     def __init__(self):
@@ -103,3 +103,8 @@ class Game:
         new_q = (1 - self.learn_rate) * current_q + self.learn_rate * (reward + self.discount * max_future_q)
         ue.log(f"Current_q {current_q} in state {old_state} and action {action} => New_q {new_q} in state {current_state}")
         self.q_table2[old_state][action] = new_q
+
+    def save_table(self):
+        table = open('Q_Table.pickle', 'wb')
+        pickle.dump(self.qtable2, table)
+        table.close()
