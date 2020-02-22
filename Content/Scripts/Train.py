@@ -29,8 +29,6 @@ class Game:
 
 
     def intialize_states(self, cur_old_e_o_hp_dist):
-
-
         ue.print_string(f"Iterator :=> {self.iterator}, Epislon :=> {self.epsilon}")
         if self.iterator == self.episodes:
             return -1
@@ -42,6 +40,16 @@ class Game:
         o_p_health = int(L[3])
         o_e_health = int(L[4])
         o_dist     = int(L[5])
+
+        if c_p_health <= 0:
+            c_p_health = 0
+        if c_e_health <= 0:
+            c_e_health = 0
+        if o_p_health <= 0:
+            o_p_health = 0
+        if o_e_health <= 0:
+            o_e_health = 0
+
 
         state = (c_p_health, c_e_health, c_dist, o_p_health, o_e_health, o_dist)
         old_distance_index = 0
@@ -64,23 +72,18 @@ class Game:
         elif 200 >= state[2] > 0:
             old_distance_index = 3
 
+
         old_state = (self.play_healths[state[0]], self.enemy_healths[state[1]], old_distance_index)
         new_state = (self.play_healths[state[3]], self.enemy_healths[state[4]], new_distance_index)
 
         self.calc_reward(new_state, old_state)
         action = self.take_action(new_state[0], new_state[1], new_state[2])
         
-        #if c_e_health == -5 or c_p_health == -5:
-        #    self.iterator += 1
-
-        #if self.iterator > self.decay_from:
-        #    self.epsilon *= self.eps_decay
-        
         return action
 
     def take_action(self, p_health, e_health, d_stance):
         index_state = (p_health, e_health, d_stance)
-        #action = np.argmax(self.q_table2[index_state])
+
         if np.random.random() > self.epsilon:
             ue.print_string("Take Max Q_Value")
             action = np.argmax(self.q_table2[index_state])
@@ -93,6 +96,12 @@ class Game:
         self.iterator += 1
         if self.iterator > self.decay_from:
             self.epsilon *= self.eps_decay
+
+        table = open('Q_Table.pickle', 'wb')
+        pickle.dump(self.q_table2, table)
+        ue.print_string(f"{self.iterator} : Saved Q_Table")
+        table.close()
+
 
     def calc_reward(self, current_state, old_state):
         reward = (old_state[1] - current_state[1]) - (old_state[0] - current_state[0])
