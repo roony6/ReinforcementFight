@@ -91,3 +91,4 @@ Saved
 *.xcodeproj
 *.xcworkspace
 *.pyc
+Content/Scripts/__pycache__/Train.cpython-37.pyc
