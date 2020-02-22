@@ -16,7 +16,7 @@ class Game:
         self.learn_rate = 0.1
         self.discount = 0.95
         self.epsilon = 0.9
-        self.eps_decay = 0.5
+        self.eps_decay = 0.95
         self.decay_from = (10/100) * self.episodes
         self.iterator = 0
 
@@ -24,7 +24,9 @@ class Game:
         # print(q_table2.ndim)
         # print(q_table2.size)
         # print(q_table2.shape)
-        self.q_table2[:, :, :2, 4:] = -float('inf') #!Magdi!#
+        self.q_table2[:, :, :2, 4] = -float('inf') #!Magdi!#
+        self.q_table2[:, :, 3, 4] =10
+        self.q_table2[:, :, 2, 4] = 3
         ue.print_string("Q_Table Class : Constructor")
 
 
