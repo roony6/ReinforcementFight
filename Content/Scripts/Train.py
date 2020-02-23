@@ -2,6 +2,7 @@ import numpy as np
 import unreal_engine as ue
 import pickle
 
+
 class Game:
     def __init__(self):
         self.actions = {0: 'MoveToPlayer', 1: 'DodgeRight', 2: 'DodgeLeft', 3: 'DodgeBack', 4: 'Attack', 5: 'Idle'}
@@ -98,13 +99,9 @@ class Game:
         self.iterator += 1
         if self.iterator > self.decay_from:
             self.epsilon *= self.eps_decay
-
-        table = open('Q_Table.pickle', 'wb')
-        pickle.dump(self.q_table2, table)
-        ue.print_string(f"{self.iterator} : Saved Q_Table")
-        table.close()
-
-
+            
+        self.save_table()
+        
     def calc_reward(self, current_state, old_state):
         reward = (old_state[1] - current_state[1]) - (old_state[0] - current_state[0])
 
@@ -116,6 +113,22 @@ class Game:
         self.q_table2[old_state][action] = new_q
 
     def save_table(self):
-        table = open('Q_Table.pickle', 'wb')
-        pickle.dump(self.qtable2, table)
-        table.close()
+        filename = r'Q_Table.pickle'
+        with open(filename, 'wb') as f:
+            pickle.dump(self.q_table2, f)
+            ue.print_string(f"{self.iterator} : Saved Q_Table")
+        filename = r'Episode.pickle'
+        with open(filename, 'wb') as f:
+            pickle.dump(self.iterator, f)
+            ue.print_string(f"{self.iterator} : Saved Episode")
+
+    def load_table(self):
+        filename = r'Q_Table.pickle'
+        with open(filename, 'rb') as f:
+            self.q_table2 = pickle.load(f)
+            ue.print_string(f"{self.iterator} : Saved Q_Table")
+        filename = r'Episode.pickle'
+        with open(filename, 'rb') as f:
+            self.iterator = pickle.load(f)
+            ue.print_string(f"{self.iterator} : Load Episode")
+        return self.iterator
