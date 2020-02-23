@@ -18,18 +18,19 @@ class Game:
         self.discount = 0.95
         self.epsilon = 0.9
         self.eps_decay = 0.95
+        self.decay_every = (5/100) * self.episodes
         self.decay_from = (10/100) * self.episodes
         self.iterator = 0
+        self.moves_counter = 0
 
         self.q_table2 = np.random.uniform(low=0, high=5, size=(len(self.play_healths), len(self.enemy_healths), len(self.distances), len(self.actions)))
         # print(q_table2.ndim)
         # print(q_table2.size)
         # print(q_table2.shape)
         self.q_table2[:, :, :2, 4] = -float('inf') #!Magdi!#
-        self.q_table2[:, :, 3, 4] =10
+        self.q_table2[:, :, 3, 4] = 10
         self.q_table2[:, :, 2, 4] = 3
         ue.print_string("Q_Table Class : Constructor")
-
 
     def intialize_states(self, cur_old_e_o_hp_dist):
         ue.print_string(f"Iterator :=> {self.iterator}, Epislon :=> {self.epsilon}")
@@ -39,10 +40,10 @@ class Game:
         L = cur_old_e_o_hp_dist.split(',')
         c_p_health = int(L[0])
         c_e_health = int(L[1])
-        c_dist     = int(L[2])
+        c_dist = int(L[2])
         o_p_health = int(L[3])
         o_e_health = int(L[4])
-        o_dist     = int(L[5])
+        o_dist = int(L[5])
 
         if c_p_health <= 0:
             c_p_health = 0
@@ -52,7 +53,6 @@ class Game:
             o_p_health = 0
         if o_e_health <= 0:
             o_e_health = 0
-
 
         state = (c_p_health, c_e_health, c_dist, o_p_health, o_e_health, o_dist)
         old_distance_index = 0
@@ -75,7 +75,6 @@ class Game:
         elif 200 >= state[2] > 0:
             old_distance_index = 3
 
-
         old_state = (self.play_healths[state[0]], self.enemy_healths[state[1]], old_distance_index)
         new_state = (self.play_healths[state[3]], self.enemy_healths[state[4]], new_distance_index)
 
@@ -97,13 +96,18 @@ class Game:
 
     def next_iterator_epsilon(self):
         self.iterator += 1
-        if self.iterator > self.decay_from:
+        if self.iterator % self.decay_every == 0 and self.iterator > self.decay_from:
             self.epsilon *= self.eps_decay
             
         self.save_table()
         
     def calc_reward(self, current_state, old_state):
-        reward = (old_state[1] - current_state[1]) - (old_state[0] - current_state[0])
+        if old_state[0] - current_state[0] == 0:
+            self.moves_counter += 1
+        reward = (old_state[1] - current_state[1]) - (old_state[0] - current_state[0]) - (self.moves_counter * 0.22)
+
+        if old_state[0] - current_state[0] != 0:
+            self.moves_counter = 0
 
         action = self.take_action(old_state[0], old_state[1], old_state[2])
         max_future_q = np.max(self.q_table2[old_state])
