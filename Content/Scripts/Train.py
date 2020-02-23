@@ -6,8 +6,8 @@ import pickle
 class Game:
     def __init__(self):
         self.actions = {0: 'MoveToPlayer', 1: 'DodgeRight', 2: 'DodgeLeft', 3: 'DodgeBack', 4: 'Attack', 5: 'Idle'}
-        self.play_healths = {0: 0, 10: 1, 25: 2, 40: 3, 55: 4, 70: 5, 85: 6, 100: 7}
-        self.enemy_healths = {0: 0, 10: 1, 25: 2, 40: 3, 55: 4, 70: 5, 85: 6, 100: 7}
+        self.play_healths = {100: 0, 95: 1, 90: 2, 85: 3, 80: 4, 75: 5, 70: 6, 65: 7, 60: 8, 55: 9, 50: 10, 45: 11, 40: 12, 35: 13, 30: 14, 25: 15, 20: 16, 15: 17, 10: 18, 5: 19, 0: 20}
+        self.enemy_healths = {100: 0, 95: 1, 90: 2, 85: 3, 80: 4, 75: 5, 70: 6, 65: 7, 60: 8, 55: 9, 50: 10, 45: 11, 40: 12, 35: 13, 30: 14, 25: 15, 20: 16, 15: 17, 10: 18, 5: 19, 0: 20}
         self.distances = {0: '1500 - 800', 1: '800 - 500', 2: '500 - 200', 3: '200 - 0'}
 
         # hit_reward = 20
@@ -22,6 +22,7 @@ class Game:
         self.decay_from = (10/100) * self.episodes
         self.iterator = 0
         self.moves_counter = 0
+        self.is_attacking = False
 
         self.q_table2 = np.random.uniform(low=0, high=5, size=(len(self.play_healths), len(self.enemy_healths), len(self.distances), len(self.actions)))
         # print(q_table2.ndim)
@@ -44,6 +45,7 @@ class Game:
         o_p_health = int(L[3])
         o_e_health = int(L[4])
         o_dist = int(L[5])
+        self.is_attacking = bool(L[6])
 
         if c_p_health <= 0:
             c_p_health = 0
@@ -77,6 +79,7 @@ class Game:
 
         old_state = (self.play_healths[state[0]], self.enemy_healths[state[1]], old_distance_index)
         new_state = (self.play_healths[state[3]], self.enemy_healths[state[4]], new_distance_index)
+        ue.print_string(f"Old State {old_state}, New State {new_state}")
 
         self.calc_reward(new_state, old_state)
         action = self.take_action(new_state[0], new_state[1], new_state[2])
@@ -104,7 +107,12 @@ class Game:
     def calc_reward(self, current_state, old_state):
         if old_state[0] - current_state[0] == 0:
             self.moves_counter += 1
-        reward = (old_state[1] - current_state[1]) - (old_state[0] - current_state[0]) - (self.moves_counter * 0.22)
+
+        succ_dodge = 0
+        if self.is_attacking and current_state[2] >= 200:
+            succ_dodge = 15
+
+        reward = (old_state[0] - current_state[0]) - (old_state[1] - current_state[1]) - (self.moves_counter * 0.22) + succ_dodge
 
         if old_state[0] - current_state[0] != 0:
             self.moves_counter = 0
