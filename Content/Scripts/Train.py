@@ -8,6 +8,8 @@ class Game:
         self.actions = {0: 'MoveToPlayer', 1: 'DodgeRight', 2: 'DodgeLeft', 3: 'DodgeBack', 4: 'Attack', 5: 'Idle'}
         self.play_healths = {100: 0, 95: 1, 90: 2, 85: 3, 80: 4, 75: 5, 70: 6, 65: 7, 60: 8, 55: 9, 50: 10, 45: 11, 40: 12, 35: 13, 30: 14, 25: 15, 20: 16, 15: 17, 10: 18, 5: 19, 0: 20}
         self.enemy_healths = {100: 0, 95: 1, 90: 2, 85: 3, 80: 4, 75: 5, 70: 6, 65: 7, 60: 8, 55: 9, 50: 10, 45: 11, 40: 12, 35: 13, 30: 14, 25: 15, 20: 16, 15: 17, 10: 18, 5: 19, 0: 20}
+        self.play_healths_inv = {0: 100, 1: 95, 2: 90, 3: 85, 4: 80, 5: 75, 6: 70, 7: 65, 8: 60, 9: 55, 10: 50, 11: 45, 12: 40, 13: 35, 14: 30, 15: 25, 16: 20, 17: 15, 18: 10, 19: 5, 20: 0}
+        self.enemy_healths_inv = {0: 100, 1: 95, 2: 90, 3: 85, 4: 80, 5: 75, 6: 70, 7: 65, 8: 60, 9: 55, 10: 50, 11: 45, 12: 40, 13: 35, 14: 30, 15: 25, 16: 20, 17: 15, 18: 10, 19: 5, 20: 0}
         self.distances = {0: '1500 - 800', 1: '800 - 500', 2: '500 - 200', 3: '200 - 0'}
 
         # hit_reward = 20
@@ -77,8 +79,8 @@ class Game:
         elif 200 >= state[2] > 0:
             old_distance_index = 3
 
-        old_state = (self.play_healths[state[0]], self.enemy_healths[state[1]], old_distance_index)
-        new_state = (self.play_healths[state[3]], self.enemy_healths[state[4]], new_distance_index)
+        old_state = (self.play_healths[state[3]], self.enemy_healths[state[4]], old_distance_index)
+        new_state = (self.play_healths[state[0]], self.enemy_healths[state[1]], new_distance_index)
         ue.print_string(f"Old State {old_state}, New State {new_state}")
 
         self.calc_reward(new_state, old_state)
@@ -105,16 +107,17 @@ class Game:
         self.save_table()
         
     def calc_reward(self, current_state, old_state):
-        if old_state[0] - current_state[0] == 0:
+        if self.enemy_healths_inv[old_state[1]] - self.enemy_healths_inv[current_state[1]] == 0:
             self.moves_counter += 1
 
         succ_dodge = 0
         if self.is_attacking and current_state[2] >= 200:
             succ_dodge = 15
 
-        reward = (old_state[0] - current_state[0]) - (old_state[1] - current_state[1]) - (self.moves_counter * 0.22) + succ_dodge
+        reward = (self.enemy_healths_inv[old_state[1]] - self.enemy_healths_inv[current_state[1]]) - (self.play_healths_inv[old_state[0]] - self.play_healths_inv[current_state[0]]) - (
+                self.moves_counter * 0.22) + succ_dodge
 
-        if old_state[0] - current_state[0] != 0:
+        if self.enemy_healths_inv[old_state[1]] - self.enemy_healths_inv[current_state[1]] != 0:
             self.moves_counter = 0
 
         action = self.take_action(old_state[0], old_state[1], old_state[2])
