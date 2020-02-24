@@ -78,7 +78,7 @@ class Game:
         elif 500 >= state[2] > 200:
             new_distance_index = 2
         elif 200 >= state[2] > 0:
-            old_distance_index = 3
+            new_distance_index = 3 #a&a
 
         old_state = (self.npc_hps[state[3]], self.opp_hps[state[4]], old_distance_index)
         new_state = (self.npc_hps[state[0]], self.opp_hps[state[1]], new_distance_index)
