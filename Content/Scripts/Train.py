@@ -17,7 +17,7 @@ class Game:
         self.learn_rate = 0.1
         self.discount = 0.95
         self.epsilon = 0.9
-        self.eps_decay = 0.95
+        self.eps_decay = 0.75
         self.decay_every = (5/100) * self.episodes
         self.decay_from = (10/100) * self.episodes
         self.iterator = 0
@@ -34,7 +34,7 @@ class Game:
         # ue.print_string("Q_Table Class : Constructor")
 
     def intialize_states(self, cur_old_e_o_hp_dist):
-        ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
+        #ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
         if self.iterator == self.episodes:
             return -1
     
@@ -45,8 +45,11 @@ class Game:
         old_npc_hp = int(L[3])
         old_opp_hp = int(L[4])
         old_dist = int(L[5])
-        self.is_attacking = bool(L[6])
-
+        if L[6] == "false":
+            self.is_attacking = False
+        else:
+            self.is_attacking = True
+        ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon} ,player is attacking is {self.is_attacking}")
         if curr_npc_hp <= 0:
             curr_npc_hp = 0
         if curr_opp_hp <= 0:
@@ -99,7 +102,7 @@ class Game:
 
     def next_iterator_epsilon(self):
         self.iterator += 1
-        if self.iterator % self.decay_every == 0 and self.iterator > self.decay_from:
+        if self.iterator % self.decay_every == 0 and self.iterator >= self.decay_from:
             self.epsilon *= self.eps_decay
             ue.print_string("DECAY")
             
@@ -108,16 +111,16 @@ class Game:
     def calc_reward(self, current_state, old_state):
         if old_state[1] * 5 - current_state[1] * 5 == 0:
             self.moves_counter += 1
-
         action = self.take_action(old_state[0], old_state[1], old_state[2])
-
         succ_dodge = 0
-        if self.is_attacking is True and current_state[2] <= 200 and (action == 1 or action == 2 or action == 3) and old_state[1] * 5 - current_state[1] * 5 == 0:
-            succ_dodge = 15
+        ue.print_string(f"player is attacking is {self.is_attacking}")
+        if self.is_attacking is True and old_state[2] == 3 and (action == 1 or action == 2 or action == 3) and old_state[0] * 5 - current_state[0] * 5 == 0:
+            succ_dodge = 5
             ue.print_string(f"successful dodge {self.is_attacking}")
+            ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
 
         reward = (old_state[1] * 5 - current_state[1] * 5) - (old_state[0] * 5 - current_state[0] * 5) - (self.moves_counter * 0.22) + succ_dodge
-        ue.print_string(f"Reward: {reward}")
+        ue.print_string(f"Reward: {reward}, with action {action} ,#moves {self.moves_counter}")
 
         if old_state[1] * 5 - current_state[1] * 5 != 0:
             self.moves_counter = 0
@@ -132,19 +135,24 @@ class Game:
         filename = r'Q_Table.pickle'
         with open(filename, 'wb') as f:
             pickle.dump(self.q_table2, f)
-            # ue.print_string(f"{self.iterator} : Saved Q_Table")
+
+            ue.print_string(f"{self.iterator} : Saved Q_Table")
+        es =(self.iterator,self.epsilon)
         filename = r'Episode.pickle'
         with open(filename, 'wb') as f:
-            pickle.dump(self.iterator, f)
-            # ue.print_string(f"{self.iterator} : Saved Episode")
+            pickle.dump(es, f)
+            ue.print_string(f"{self.iterator} : Saved Episode")
 
     def load_table(self):
         filename = r'Q_Table.pickle'
         with open(filename, 'rb') as f:
             self.q_table2 = pickle.load(f)
-            # ue.print_string(f"{self.iterator} : Load Q_Table")
+
+            ue.print_string(f"{self.iterator} : Q_Table is loaded")
         filename = r'Episode.pickle'
         with open(filename, 'rb') as f:
-            self.iterator = pickle.load(f)
-            # ue.print_string(f"{self.iterator} : Load Episode")
+            es = pickle.load(f)
+            self.iterator=es[0]
+            self.epsilon =es[1]
+            ue.print_string(f"{self.iterator} : #Episodes is loaded")
         return self.iterator
