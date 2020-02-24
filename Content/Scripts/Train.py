@@ -34,7 +34,7 @@ class Game:
         # ue.print_string("Q_Table Class : Constructor")
 
     def intialize_states(self, cur_old_e_o_hp_dist):
-        ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
+        #ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
         if self.iterator == self.episodes:
             return -1
     
@@ -45,8 +45,11 @@ class Game:
         old_npc_hp = int(L[3])
         old_opp_hp = int(L[4])
         old_dist = int(L[5])
-        self.is_attacking = bool(L[6])
-
+        if L[6] == "false":
+            self.is_attacking = False
+        else:
+            self.is_attacking = True
+        ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon} ,player is attacking is {self.is_attacking}")
         if curr_npc_hp <= 0:
             curr_npc_hp = 0
         if curr_opp_hp <= 0:
@@ -110,20 +113,14 @@ class Game:
             self.moves_counter += 1
         action = self.take_action(old_state[0], old_state[1], old_state[2])
         succ_dodge = 0
-        if self.is_attacking is True and current_state[2] <= 200 and (action == 1 or action == 2 or action == 3) and self.play_healths_inv[old_state[1]] - self.play_healths_inv[current_state[1]] == 0:
+        ue.print_string(f"player is attacking is {self.is_attacking}")
+        if self.is_attacking is True and old_state[2] == 3 and (action == 1 or action == 2 or action == 3) and old_state[0] * 5 - current_state[0] * 5 == 0:
             succ_dodge = 5
-            ue.log(f"successful dodge , with action {action}")
-        reward = (self.enemy_healths_inv[old_state[1]] - self.enemy_healths_inv[current_state[1]]) - (self.play_healths_inv[old_state[0]] - self.play_healths_inv[current_state[0]]) - (
-                self.moves_counter * 0.22) + succ_dodge
-        ue.log(f"reward {reward}, for action {action}")
-        succ_dodge = 0
-
-        if self.is_attacking is True and current_state[2] <= 200 and (action == 1 or action == 2 or action == 3) and old_state[1] * 5 - current_state[1] * 5 == 0:
-            succ_dodge = 15
             ue.print_string(f"successful dodge {self.is_attacking}")
+            ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
 
         reward = (old_state[1] * 5 - current_state[1] * 5) - (old_state[0] * 5 - current_state[0] * 5) - (self.moves_counter * 0.22) + succ_dodge
-        ue.print_string(f"Reward: {reward}")
+        ue.print_string(f"Reward: {reward}, with action {action} ,#moves {self.moves_counter}")
 
         if old_state[1] * 5 - current_state[1] * 5 != 0:
             self.moves_counter = 0
