@@ -34,7 +34,7 @@ class Game:
         # ue.print_string("Q_Table Class : Constructor")
 
     def intialize_states(self, cur_old_e_o_hp_dist):
-        #ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
+        # ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
         if self.iterator == self.episodes:
             return -1
     
@@ -49,7 +49,7 @@ class Game:
             self.is_attacking = False
         else:
             self.is_attacking = True
-        ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon} ,player is attacking is {self.is_attacking}")
+        # ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon} ,player is attacking is {self.is_attacking}")
         if curr_npc_hp <= 0:
             curr_npc_hp = 0
         if curr_opp_hp <= 0:
@@ -93,15 +93,17 @@ class Game:
         index_state = (p_health, e_health, d_stance)
 
         if np.random.random() > self.epsilon:
-            # ue.print_string("Take Max Q_Value")
+            ue.print_string("Take Max Q_Value")
             action = np.argmax(self.q_table2[index_state])
         else:
-            # ue.print_string("Explore: Random Action")
+            ue.print_string("Explore: Random Action")
             action = np.random.randint(0, 6)
         return action
 
     def next_iterator_epsilon(self):
         self.iterator += 1
+        self.moves_counter = 0
+        # ue.print_string(f"MOVES ARE ZEROED YO!!!! {self.moves_counter}")
         if self.iterator % self.decay_every == 0 and self.iterator >= self.decay_from:
             self.epsilon *= self.eps_decay
             ue.print_string("DECAY")
@@ -113,14 +115,14 @@ class Game:
             self.moves_counter += 1
         action = self.take_action(old_state[0], old_state[1], old_state[2])
         succ_dodge = 0
-        ue.print_string(f"player is attacking is {self.is_attacking}")
+        # ue.print_string(f"player is attacking is {self.is_attacking}")
         if self.is_attacking is True and old_state[2] == 3 and (action == 1 or action == 2 or action == 3) and old_state[0] * 5 - current_state[0] * 5 == 0:
             succ_dodge = 5
-            ue.print_string(f"successful dodge {self.is_attacking}")
-            ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
+            # ue.print_string(f"successful dodge {self.is_attacking}")
+            # ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
 
         reward = (old_state[1] * 5 - current_state[1] * 5) - (old_state[0] * 5 - current_state[0] * 5) - (self.moves_counter * 0.22) + succ_dodge
-        ue.print_string(f"Reward: {reward}, with action {action} ,#moves {self.moves_counter}")
+        # ue.print_string(f"Reward: {reward}, with action {action} ,#moves {self.moves_counter}")
 
         if old_state[1] * 5 - current_state[1] * 5 != 0:
             self.moves_counter = 0
@@ -128,31 +130,31 @@ class Game:
         max_future_q = np.max(self.q_table2[old_state])
         current_q = self.q_table2[old_state][action]
         new_q = (1 - self.learn_rate) * current_q + self.learn_rate * (reward + self.discount * max_future_q)
-        ue.log(f"Current_q {current_q} in state {old_state} and action {action} => New_q {new_q} in state {current_state}")
+        # ue.log(f"Current_q {current_q} in state {old_state} and action {action} => New_q {new_q} in state {current_state}")
         self.q_table2[old_state][action] = new_q
 
     def save_table(self):
-        filename = r'Q_Table.pickle'
+        filename = r'./Q_Table.pickle'
         with open(filename, 'wb') as f:
             pickle.dump(self.q_table2, f)
 
             ue.print_string(f"{self.iterator} : Saved Q_Table")
-        es =(self.iterator,self.epsilon)
-        filename = r'Episode.pickle'
+        es = (self.iterator, self.epsilon)
+        filename = r'./Episode.pickle'
         with open(filename, 'wb') as f:
             pickle.dump(es, f)
             ue.print_string(f"{self.iterator} : Saved Episode")
 
     def load_table(self):
-        filename = r'Q_Table.pickle'
+        filename = r'./Q_Table.pickle'
         with open(filename, 'rb') as f:
             self.q_table2 = pickle.load(f)
 
             ue.print_string(f"{self.iterator} : Q_Table is loaded")
-        filename = r'Episode.pickle'
+        filename = r'./Episode.pickle'
         with open(filename, 'rb') as f:
             es = pickle.load(f)
-            self.iterator=es[0]
-            self.epsilon =es[1]
+            self.iterator = es[0]
+            self.epsilon = es[1]
             ue.print_string(f"{self.iterator} : #Episodes is loaded")
         return self.iterator
