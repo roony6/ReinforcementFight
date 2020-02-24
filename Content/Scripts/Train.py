@@ -19,7 +19,7 @@ class Game:
         self.learn_rate = 0.1
         self.discount = 0.95
         self.epsilon = 0.9
-        self.eps_decay = 0.95
+        self.eps_decay = 0.75
         self.decay_every = (5/100) * self.episodes
         self.decay_from = (10/100) * self.episodes
         self.iterator = 0
@@ -101,7 +101,7 @@ class Game:
 
     def next_iterator_epsilon(self):
         self.iterator += 1
-        if self.iterator % self.decay_every == 0 and self.iterator > self.decay_from:
+        if self.iterator % self.decay_every == 0 and self.iterator >= self.decay_from:
             self.epsilon *= self.eps_decay
             
         self.save_table()
@@ -109,18 +109,18 @@ class Game:
     def calc_reward(self, current_state, old_state):
         if self.enemy_healths_inv[old_state[1]] - self.enemy_healths_inv[current_state[1]] == 0:
             self.moves_counter += 1
-
+        action = self.take_action(old_state[0], old_state[1], old_state[2])
         succ_dodge = 0
-        if self.is_attacking and current_state[2] >= 200:
-            succ_dodge = 15
+        if self.is_attacking is True and current_state[2] <= 200 and (action == 1 or action == 2 or action == 3) and self.play_healths_inv[old_state[1]] - self.play_healths_inv[current_state[1]] == 0:
+            succ_dodge = 5
+            ue.log(f"successful dodge , with action {action}")
 
         reward = (self.enemy_healths_inv[old_state[1]] - self.enemy_healths_inv[current_state[1]]) - (self.play_healths_inv[old_state[0]] - self.play_healths_inv[current_state[0]]) - (
                 self.moves_counter * 0.22) + succ_dodge
-
+        ue.log(f"reward {reward}, for action {action}")
         if self.enemy_healths_inv[old_state[1]] - self.enemy_healths_inv[current_state[1]] != 0:
             self.moves_counter = 0
 
-        action = self.take_action(old_state[0], old_state[1], old_state[2])
         max_future_q = np.max(self.q_table2[old_state])
         current_q = self.q_table2[old_state][action]
         new_q = (1 - self.learn_rate) * current_q + self.learn_rate * (reward + self.discount * max_future_q)
@@ -132,18 +132,22 @@ class Game:
         with open(filename, 'wb') as f:
             pickle.dump(self.q_table2, f)
             ue.print_string(f"{self.iterator} : Saved Q_Table")
+        es =(self.iterator,self.epsilon)
         filename = r'Episode.pickle'
         with open(filename, 'wb') as f:
-            pickle.dump(self.iterator, f)
+            pickle.dump(es, f)
             ue.print_string(f"{self.iterator} : Saved Episode")
+
 
     def load_table(self):
         filename = r'Q_Table.pickle'
         with open(filename, 'rb') as f:
             self.q_table2 = pickle.load(f)
-            ue.print_string(f"{self.iterator} : Saved Q_Table")
+            ue.print_string(f"{self.iterator} : Q_Table is loaded")
         filename = r'Episode.pickle'
         with open(filename, 'rb') as f:
-            self.iterator = pickle.load(f)
-            ue.print_string(f"{self.iterator} : Load Episode")
+            es = pickle.load(f)
+            self.iterator=es[0]
+            self.epsilon =es[1]
+            ue.print_string(f"{self.iterator} : #Episodes is loaded")
         return self.iterator
