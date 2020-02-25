@@ -28,9 +28,9 @@ class Game:
         # print(q_table2.ndim)
         # print(q_table2.size)
         # print(q_table2.shape)
-        self.q_table2[:, :, :2, 4] = -float('inf') #!Magdi!#
-        self.q_table2[:, :, 3, 4] = 10
-        self.q_table2[:, :, 2, 4] = 3
+        self.q_table2[:, :, :2, 4] = -10 #!Magdi!#
+        self.q_table2[:, :, 3, 4] = 5
+        self.q_table2[:, :, 2, 4] = 1
         # ue.print_string("Q_Table Class : Constructor")
 
     def intialize_states(self, cur_old_e_o_hp_dist):
@@ -95,6 +95,7 @@ class Game:
         if np.random.random() > self.epsilon:
             ue.print_string("Take Max Q_Value")
             action = np.argmax(self.q_table2[index_state])
+            ue.log(f"{self.q_table2[index_state]}")
         else:
             ue.print_string("Explore: Random Action")
             action = np.random.randint(0, 6)
