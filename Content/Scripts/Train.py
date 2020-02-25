@@ -101,7 +101,7 @@ class Game:
             action = np.random.randint(0, 6)
         return action
 
-    def next_iterator_epsilon(self):
+    def next_iterator_epsilon(self, name):
         self.iterator += 1
         self.moves_counter = 0
         # ue.print_string(f"MOVES ARE ZEROED YO!!!! {self.moves_counter}")
@@ -109,7 +109,7 @@ class Game:
             self.epsilon *= self.eps_decay
             ue.print_string("DECAY")
             
-        self.save_table()
+        self.save_table(name)
         
     def calc_reward(self, current_state, old_state):
         if old_state[1] * 5 - current_state[1] * 5 == 0:
@@ -134,25 +134,25 @@ class Game:
         # ue.log(f"Current_q {current_q} in state {old_state} and action {action} => New_q {new_q} in state {current_state}")
         self.q_table2[old_state][action] = new_q
 
-    def save_table(self):
-        filename = r'./Q_Table.pickle'
+    def save_table(self, name):
+        filename = rf'./Q_Table{name}.pickle'
         with open(filename, 'wb') as f:
             pickle.dump(self.q_table2, f)
 
             ue.print_string(f"{self.iterator} : Saved Q_Table")
         es = (self.iterator, self.epsilon)
-        filename = r'./Episode.pickle'
+        filename = rf'./Episode{name}.pickle'
         with open(filename, 'wb') as f:
             pickle.dump(es, f)
             ue.print_string(f"{self.iterator} : Saved Episode")
 
-    def load_table(self):
-        filename = r'./Q_Table.pickle'
+    def load_table(self, name):
+        filename = rf'./Q_Table{name}.pickle'
         with open(filename, 'rb') as f:
             self.q_table2 = pickle.load(f)
 
             ue.print_string(f"{self.iterator} : Q_Table is loaded")
-        filename = r'./Episode.pickle'
+        filename = rf'./Episode{name}.pickle'
         with open(filename, 'rb') as f:
             es = pickle.load(f)
             self.iterator = es[0]
