@@ -28,13 +28,13 @@ class Game:
         # print(q_table2.ndim)
         # print(q_table2.size)
         # print(q_table2.shape)
-        self.q_table2[:, :, :2, 4] = -10 #!Magdi!#
+        self.q_table2[:, :, :2, 4] = -100 #!Magdi!#
         self.q_table2[:, :, 3, 4] = 5
         self.q_table2[:, :, 2, 4] = 1
         # ue.print_string("Q_Table Class : Constructor")
 
     def intialize_states(self, cur_old_e_o_hp_dist):
-        # ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
+        ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
         if self.iterator == self.episodes:
             return -1
     
