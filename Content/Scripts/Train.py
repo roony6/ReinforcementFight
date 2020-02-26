@@ -9,11 +9,12 @@ class Game:
         self.npc_hps = {0: 0, 5: 1, 10: 2, 15: 3, 20: 4, 25: 5, 30: 6, 35: 7, 40: 8, 45: 9, 50: 10, 55: 11, 60: 12, 65: 13, 70: 14, 75: 15, 80: 16, 85: 17, 90: 18, 95: 19, 100: 20}
         self.opp_hps = {0: 0, 5: 1, 10: 2, 15: 3, 20: 4, 25: 5, 30: 6, 35: 7, 40: 8, 45: 9, 50: 10, 55: 11, 60: 12, 65: 13, 70: 14, 75: 15, 80: 16, 85: 17, 90: 18, 95: 19, 100: 20}
         self.distances = {0: '1500 - 800', 1: '800 - 500', 2: '500 - 200', 3: '200 - 0'}
-
+        self.NPC_wins = 0
+        self.opp_wins = 0
         # hit_reward = 20
         # hit_penalty = -20
         # move_penalty = -2
-        self.episodes = 200
+        self.episodes = 5000
         self.learn_rate = 0.1
         self.discount = 0.95
         self.epsilon = 0.9
@@ -23,7 +24,6 @@ class Game:
         self.iterator = 0
         self.moves_counter = 0
         self.is_attacking = False
-
         self.q_table2 = np.random.uniform(low=0, high=5, size=(len(self.npc_hps), len(self.opp_hps), len(self.distances), len(self.actions)))
         # print(q_table2.ndim)
         # print(q_table2.size)
@@ -108,7 +108,7 @@ class Game:
         if self.iterator % self.decay_every == 0 and self.iterator >= self.decay_from:
             self.epsilon *= self.eps_decay
             ue.print_string("DECAY")
-            
+
         self.save_table(name)
         
     def calc_reward(self, current_state, old_state):
@@ -135,16 +135,19 @@ class Game:
         self.q_table2[old_state][action] = new_q
 
     def save_table(self, name):
-        filename = rf'./Q_Table{name}.pickle'
+        args = name.split(',')
+        self.NPC_wins = int(args[1])
+        self.opp_wins = int(args[2])
+        filename = rf'./Q_Table{args[0]}.pickle'
         with open(filename, 'wb') as f:
             pickle.dump(self.q_table2, f)
 
             ue.print_string(f"{self.iterator} : Saved Q_Table")
-        es = (self.iterator, self.epsilon)
-        filename = rf'./Episode{name}.pickle'
+        es = (self.iterator, self.epsilon,self.NPC_wins,self.opp_wins)
+        filename = rf'./Episode{args[0]}.pickle'
         with open(filename, 'wb') as f:
             pickle.dump(es, f)
-            ue.print_string(f"{self.iterator} : Saved Episode")
+            ue.log(f"{self.iterator} : Saved Episode , winning rate : {(self.NPC_wins/self.iterator)*100}")
 
     def load_table(self, name):
         filename = rf'./Q_Table{name}.pickle'
@@ -157,5 +160,8 @@ class Game:
             es = pickle.load(f)
             self.iterator = es[0]
             self.epsilon = es[1]
+            self.NPC_wins=es[2]
+            self.opp_wins=es[3]
             ue.print_string(f"{self.iterator} : #Episodes is loaded")
-        return self.iterator
+            str=f"{self.iterator},{self.NPC_wins},{self.opp_wins}"
+        return str
