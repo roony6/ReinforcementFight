@@ -160,8 +160,8 @@ class Game:
             es = pickle.load(f)
             self.iterator = es[0]
             self.epsilon = es[1]
-            self.NPC_wins=es[2]
-            self.opp_wins=es[3]
+            self.NPC_wins = es[2]
+            self.opp_wins = es[3]
             ue.print_string(f"{self.iterator} : #Episodes is loaded")
-            str=f"{self.iterator},{self.NPC_wins},{self.opp_wins}"
-        return str
+            itr_n_o_wins = f"{self.iterator},{self.NPC_wins},{self.opp_wins}"
+        return itr_n_o_wins
