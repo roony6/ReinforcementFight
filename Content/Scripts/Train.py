@@ -8,7 +8,7 @@ class Game:
         self.actions = {0: 'MoveToPlayer', 1: 'DodgeRight', 2: 'DodgeLeft', 3: 'DodgeBack', 4: 'Attack', 5: 'Idle'}
         self.npc_hps = {0: 0, 5: 1, 10: 2, 15: 3, 20: 4, 25: 5, 30: 6, 35: 7, 40: 8, 45: 9, 50: 10, 55: 11, 60: 12, 65: 13, 70: 14, 75: 15, 80: 16, 85: 17, 90: 18, 95: 19, 100: 20}
         self.opp_hps = {0: 0, 5: 1, 10: 2, 15: 3, 20: 4, 25: 5, 30: 6, 35: 7, 40: 8, 45: 9, 50: 10, 55: 11, 60: 12, 65: 13, 70: 14, 75: 15, 80: 16, 85: 17, 90: 18, 95: 19, 100: 20}
-        self.distances = {0: '1500 - 800', 1: '800 - 500', 2: '500 - 200', 3: '200 - 0'}
+        self.distances = {0: '2000 - 800', 1: '800 - 500', 2: '500 - 200', 3: '200 - 0'}
         self.NPC_wins = 0
         self.opp_wins = 0
         # hit_reward = 20
@@ -34,7 +34,6 @@ class Game:
         # ue.print_string("Q_Table Class : Constructor")
 
     def intialize_states(self, cur_old_e_o_hp_dist):
-        ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
         if self.iterator == self.episodes:
             return -1
     
@@ -61,7 +60,7 @@ class Game:
 
         state = (curr_npc_hp, curr_opp_hp, curr_dist, old_npc_hp, old_opp_hp, old_dist)
         old_distance_index = 0
-        if 1500 >= state[5] > 800:
+        if 2000 >= state[5] > 800:
             old_distance_index = 0
         elif 800 >= state[5] > 500:
             old_distance_index = 1
@@ -71,7 +70,7 @@ class Game:
             old_distance_index = 3
 
         new_distance_index = 0
-        if 1500 >= state[2] > 800:
+        if 2000 >= state[2] > 800:
             new_distance_index = 0
         elif 800 >= state[2] > 500:
             new_distance_index = 1
@@ -95,13 +94,14 @@ class Game:
         if np.random.random() > self.epsilon:
             ue.print_string("Take Max Q_Value")
             action = np.argmax(self.q_table2[index_state])
-            ue.log(f"{self.q_table2[index_state]}")
+            # ue.log(f"{self.q_table2[index_state]}")
         else:
             ue.print_string("Explore: Random Action")
             action = np.random.randint(0, 6)
         return action
 
     def next_iterator_epsilon(self, name):
+        ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
         self.iterator += 1
         self.moves_counter = 0
         # ue.print_string(f"MOVES ARE ZEROED YO!!!! {self.moves_counter}")
@@ -123,7 +123,7 @@ class Game:
             # ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
 
         reward = (old_state[1] * 5 - current_state[1] * 5) - (old_state[0] * 5 - current_state[0] * 5) - (self.moves_counter * 0.22) + succ_dodge
-        # ue.print_string(f"Reward: {reward}, with action {action} ,#moves {self.moves_counter}")
+        ue.print_string(f"Reward: {reward}, with action {action}, #moves {self.moves_counter}")
 
         if old_state[1] * 5 - current_state[1] * 5 != 0:
             self.moves_counter = 0
@@ -131,7 +131,7 @@ class Game:
         max_future_q = np.max(self.q_table2[old_state])
         current_q = self.q_table2[old_state][action]
         new_q = (1 - self.learn_rate) * current_q + self.learn_rate * (reward + self.discount * max_future_q)
-        # ue.log(f"Current_q {current_q} in state {old_state} and action {action} => New_q {new_q} in state {current_state}")
+        ue.log(f"Current_q {round(current_q, 2)} in state {old_state} and action {action} => New_q {round(new_q, 2) } in state {current_state}")
         self.q_table2[old_state][action] = new_q
 
     def save_table(self, name):
