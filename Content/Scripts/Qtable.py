@@ -14,8 +14,8 @@ class Game:
         self.distances = {0: 'inf - 1000', 1: '1000 - 500', 2: '500 - 300', 3: '300 - 200', 4: '200 - 0'}
         self.NPC_wins = 0
         self.opp_wins = 0
-        self.opp_ce_actions = []
-        self.NPC_ce_actions = []
+        self.opp_ce_actions = [23, 23, 23, 23]
+        self.NPC_ce_actions = [9, 9, 9, 9]
         # hit_reward = 20
         # hit_penalty = -20
         # move_penalty = -2
@@ -34,10 +34,10 @@ class Game:
         # print(q_table2.size)
         # print(q_table2.shape)
         self.q_table2[:, :, :2, :, :, :, :, :, 1:9] = -100  # !Magdi!#
-        self.q_table2[:, :, :, 0:10, :, :, :, :, 1:4] = -int('inf')
-        self.q_table2[:, :, :, 0:20, :, :, :, :, 4:8] = -int('inf')
-        self.q_table2[:, :, :, 0:30, :, :, :, :, 4:8] = -int('inf')
-        self.q_table2[:, :, :, 0:45, :, :, :, :, 4:8] = -int('inf')
+        self.q_table2[:, :, :, 0:10, :, :, :, :, 1:4] = -float('inf')
+        self.q_table2[:, :, :, 0:20, :, :, :, :, 4:8] = -float('inf')
+        self.q_table2[:, :, :, 0:30, :, :, :, :, 4:8] = -float('inf')
+        self.q_table2[:, :, :, 0:45, :, :, :, :, 4:8] = -float('inf')
         self.q_table2[:, :, 0:4, :, :, :, :, :, 0] = 100
         self.q_table2[:, :, 5, :, :, :, :, :, 4:9] = 100
         self.q_table2[:, :, 4, :, :, :, :, :, 4:9] = 5
@@ -56,7 +56,7 @@ class Game:
         old_npc_hp = int(L[3])
         old_opp_hp = int(L[4])
         old_dist = int(L[5])
-        self.opp_ce_actions.append(L[6])
+        #self.opp_ce_actions.append(L[6])
         if L[6] == "true":
             self.is_attacking = True
         else:
@@ -97,8 +97,8 @@ class Game:
         elif 200 >= state[2] > 0:
             new_distance_index = 4  # a&a
 
-        old_state = (self.npc_hps[state[3]], self.opp_hps[state[4]], old_distance_index, -1, -1, self.NPC_ce_actions[self.NPC_ce_actions.size-1], self.opp_ce_actions[self.opp_ce_actions.length-1], self.opp_ce_actions[self.opp_ce_actions.length-2])
-        new_state = (self.npc_hps[state[0]], self.opp_hps[state[1]], new_distance_index, 9, self.opp_ce_actions[self.opp_ce_actions.length-2], self.opp_ce_actions[self.opp_ce_actions.length-3])
+        old_state = (self.npc_hps[state[3]], self.opp_hps[state[4]], old_distance_index, -1, -1, self.NPC_ce_actions[len(self.NPC_ce_actions)-1], self.opp_ce_actions[len(self.opp_ce_actions)-1], self.opp_ce_actions[len(self.NPC_ce_actions)-2])
+        new_state = (self.npc_hps[state[0]], self.opp_hps[state[1]], new_distance_index, 9, self.opp_ce_actions[len(self.NPC_ce_actions)-2], self.opp_ce_actions[len(self.NPC_ce_actions)-3])
         # ue.print_string(f"Old State {old_state}, New State {new_state}")
 
         self.calc_reward(new_state, old_state)
@@ -111,19 +111,19 @@ class Game:
         if np.random.random() > self.epsilon:
             ue.print_string("Take Max Q_Value")
             action = np.argmax(self.q_table2[index_state])
-            self.NPC_ce_actions.append(action)
+            self.NPC_ce_actions[3] = action
             ue.log(f"{self.q_table2[index_state]}")
         else:
             ue.print_string("Explore: Random Action")
             action = np.random.randint(0, 9)
-            self.NPC_ce_actions.append(action)
+            self.NPC_ce_actions[3] = action
         return action
 
     def next_iterator_epsilon(self, name):
         self.iterator += 1
         self.moves_counter = 0
-        self.opp_ce_actions = []
-        self.NPC_ce_actions = []
+        self.opp_ce_actions = [23,23,23,23]
+        self.NPC_ce_actions = [9, 9, 9, 9]
         # ue.print_string(f"MOVES ARE ZEROED YO!!!! {self.moves_counter}")
         if self.iterator % self.decay_every == 0 and self.iterator >= self.decay_from:
             self.epsilon *= self.eps_decay
@@ -134,7 +134,7 @@ class Game:
     def calc_reward(self, current_state, old_state):
         if old_state[1] * 5 - current_state[1] * 5 == 0:
             self.moves_counter += 1
-        action = self.NPC_ce_actions(self.NPC_ce_actions.size-1)
+        action = self.NPC_ce_actions(len(self.NPC_ce_actions)-1)
         succ_dodge = 0
         # ue.print_string(f"player is attacking is {self.is_attacking}")
         if self.is_attacking is True and old_state[2] == 3 and (action == 1 or action == 2 or action == 3) and \
@@ -157,7 +157,7 @@ class Game:
         self.q_table2[old_state][action] = new_q
 
     def take_opponent_action(self, action):
-        self.opp_ce_actions.append(action)
+        self.opp_ce_actions[3] = action
         if action == "16" or action == "17" or action == "18" or action == "19" or action == "20" or action == "21":
             self.is_attacking = True
         else:
