@@ -39,10 +39,10 @@ class Game:
         self.q_table2[:, :, :, 0:20, :, :, :, :, 4:8] = -float('inf')
         self.q_table2[:, :, :, 0:30, :, :, :, :, 4:8] = -float('inf')
         self.q_table2[:, :, :, 0:45, :, :, :, :, 4:8] = -float('inf')
-        self.q_table2[:, :, 0:4, :, :, :, :, :, 0] = 100
-        self.q_table2[:, :, 5, :, :, :, :, :, 4:9] = 100
-        self.q_table2[:, :, 4, :, :, :, :, :, 4:9] = 5
-        self.q_table2[:, :, 3, :, :, :, :, :, 4:9] = 1
+        self.q_table2[:, :, 0:3, :, :, :, :, :, 0] = 100
+        self.q_table2[:, :, 4, :, :, :, :, :, 4:9] = 100
+        self.q_table2[:, :, 3, :, :, :, :, :, 4:9] = 5
+        self.q_table2[:, :, 2, :, :, :, :, :, 4:9] = 1
         # ue.print_string("Q_Table Class : Constructor")
 
     def intialize_states(self, cur_old_e_o_hp_dist):
@@ -62,7 +62,10 @@ class Game:
             self.is_attacking = True
         else:
             self.is_attacking = False
-
+        npc_c_stamina = L[7]
+        opp_c_stamina = L[8]
+        old_npc_c_stamina = L[7]
+        old_opp_c_stamina = L[8]
         # ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon} ,player is attacking is {self.is_attacking}")
         if curr_npc_hp <= 0:
             curr_npc_hp = 0
@@ -72,6 +75,15 @@ class Game:
             old_npc_hp = 0
         if old_opp_hp <= 0:
             old_opp_hp = 0
+
+        if npc_c_stamina <= 0:
+            npc_c_stamina = 0
+        if opp_c_stamina <= 0:
+            opp_c_stamina = 0
+        if old_npc_c_stamina <= 0:
+            old_npc_c_stamina = 0
+        if opp_c_stamina <= 0:
+            old_opp_c_stamina = 0
 
         state = (curr_npc_hp, curr_opp_hp, curr_dist, old_npc_hp, old_opp_hp, old_dist)
         old_distance_index = 0
@@ -98,8 +110,8 @@ class Game:
         elif 200 >= state[2] > 0:
             new_distance_index = 4  # a&a
 
-        old_state = (self.npc_hps[state[3]], self.opp_hps[state[4]], old_distance_index, -1, -1, self.NPC_ce_actions[len(self.NPC_ce_actions)-1], self.opp_ce_actions[len(self.opp_ce_actions)-1], self.opp_ce_actions[len(self.NPC_ce_actions)-2])
-        new_state = (self.npc_hps[state[0]], self.opp_hps[state[1]], new_distance_index, 9, self.opp_ce_actions[len(self.NPC_ce_actions)-2], self.opp_ce_actions[len(self.NPC_ce_actions)-3])
+        old_state = (self.npc_hps[state[3]], self.opp_hps[state[4]], old_distance_index, self.npc_stmn[old_npc_c_stamina], self.opp_stmn[old_opp_c_stamina], self.NPC_ce_actions[2], self.opp_ce_actions[1], self.opp_ce_actions[2])
+        new_state = (self.npc_hps[state[0]], self.opp_hps[state[1]], new_distance_index, self.npc_stmn[npc_c_stamina], self.opp_stmn[opp_c_stamina], self.NPC_ce_actions[3], self.opp_ce_actions[2], self.opp_ce_actions[3])
         # ue.print_string(f"Old State {old_state}, New State {new_state}")
 
         self.calc_reward(new_state, old_state)
@@ -135,7 +147,7 @@ class Game:
     def calc_reward(self, current_state, old_state):
         if old_state[1] * 5 - current_state[1] * 5 == 0:
             self.moves_counter += 1
-        action = self.NPC_ce_actions(len(self.NPC_ce_actions)-1)
+        action = self.NPC_ce_actions[3]
         succ_dodge = 0
         # ue.print_string(f"player is attacking is {self.is_attacking}")
         if self.is_attacking is True and old_state[2] == 3 and (action == 1 or action == 2 or action == 3) and \
@@ -159,7 +171,7 @@ class Game:
 
     def take_opponent_action(self, action):
         self.opp_ce_actions[3] = action
-        if action == "16" or action == "17" or action == "18" or action == "19" or action == "20" or action == "21":
+        if action == "4" or action == "5" or action == "6" or action == "7":
             self.is_attacking = True
         else:
             self.is_attacking = False
