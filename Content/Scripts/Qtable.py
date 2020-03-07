@@ -8,14 +8,14 @@ class Game:
         self.actions = {0: 'MoveToPlayer', 1: 'DodgeRight', 2: 'DodgeLeft', 3: 'DodgeBack', 4: 'Attack', 5: 'Attack1', 6: 'Attack2', 7: 'Attack3', 8: 'disengage', 9: 'Idle'}
         self.opponent_actions = {0: 'MoveToPlayer', 1: 'DodgeRight', 2: 'DodgeLeft', 3: 'DodgeBack', 4: 'Attack', 5: 'Attack1', 6: 'Attack2', 7: 'Attack3', 8: 'disengage', 9: 'Idle'}
         #self.opponent_actions = {0: 'Move_forward', 1: 'Move_backwards', 2: 'Move_right', 3: 'Move_left', 4: 'Move_uright', 5: 'Move_uleft', 6: 'Move_bright', 7: 'Move_bleft', 8: 'Dodgeforward', 9: 'DodgeRight', 10: 'DodgeLeft', 11: 'DodgeBack', 12: 'dodge_uright', 13: 'dodge_uleft', 14: 'dodge_bright', 15: 'dodge_bleft', 16: 'Attack',17: 'P_Moving_Attack',18: 'R_Moving_Attack', 19: 'Attack1', 20: 'Attack2', 21: 'Attack3', 22: 'disengage', 23: 'Idle'}
-        self.npc_hps = {0: 0, 10: 1, 20: 2, 30: 3, 40: 4, 50: 5, 60: 6, 70: 7, 80: 8, 90: 9, 100: 10}
-        self.opp_hps = {0: 0, 10: 1, 20: 2, 30: 3, 40: 4, 50: 5, 60: 6, 70: 7, 80: 8, 90: 9, 100: 10}
+        self.npc_hps = {25: 0, 50: 1, 75: 2, 100: 3}
+        self.opp_hps = {25: 0, 50: 1, 75: 2, 100: 3}
         self.npc_stmn = {0: 0, 10: 1, 20: 2, 30: 3, 40: 4, 50: 5, 60: 6, 70: 7, 80: 8, 90: 9, 100: 10}
         self.opp_stmn = {0: 0, 10: 1, 20: 2, 30: 3, 40: 4, 50: 5, 60: 6, 70: 7, 80: 8, 90: 9, 100: 10}
         self.distances = {0: 'inf - 1000', 1: '1000 - 500', 2: '500 - 300', 3: '300 - 200', 4: '200 - 0'}
         self.NPC_wins = 0
         self.opp_wins = 0
-        self.opp_ce_actions = [23, 23, 23, 23]
+        self.opp_ce_actions = [9, 9, 9, 9]
         self.NPC_ce_actions = [9, 9, 9, 9]
         # hit_reward = 20
         # hit_penalty = -20
@@ -110,8 +110,48 @@ class Game:
         elif 200 >= state[2] > 0:
             new_distance_index = 4  # a&a
 
-        old_state = (self.npc_hps[state[3]], self.opp_hps[state[4]], old_distance_index, self.npc_stmn[old_npc_c_stamina], self.opp_stmn[old_opp_c_stamina], self.NPC_ce_actions[2], self.opp_ce_actions[1], self.opp_ce_actions[2])
-        new_state = (self.npc_hps[state[0]], self.opp_hps[state[1]], new_distance_index, self.npc_stmn[npc_c_stamina], self.opp_stmn[opp_c_stamina], self.NPC_ce_actions[3], self.opp_ce_actions[2], self.opp_ce_actions[3])
+        new_NPC_HPi = 0
+        if curr_npc_hp <= 25:
+            new_NPC_HPi = 0
+        elif 25 > curr_npc_hp >= 50:
+            new_NPC_HPi = 1
+        elif 50 > curr_npc_hp >= 75:
+            new_NPC_HPi = 2
+        elif 75 > curr_npc_hp >= 100:
+            new_NPC_HPi = 3
+
+        old_NPC_HPi = 0
+        if old_npc_hp <= 25:
+            old_NPC_HPi = 0
+        elif 25 > old_npc_hp >= 50:
+            old_NPC_HPi = 1
+        elif 50 > old_npc_hp >= 75:
+            old_NPC_HPi = 2
+        elif 75 > old_npc_hp >= 100:
+            old_NPC_HPi = 3
+
+        new_opp_HPi = 0
+        if curr_opp_hp <= 25:
+            new_opp_HPi = 0
+        elif 25 > curr_opp_hp >= 50:
+            new_opp_HPi = 1
+        elif 50 > curr_opp_hp >= 75:
+            new_opp_HPi = 2
+        elif 75 > curr_opp_hp >= 100:
+            new_opp_HPi = 3
+
+        old_opp_HPi = 0
+        if old_opp_hp <= 25:
+            old_opp_HPi = 0
+        elif 25 > old_opp_hp >= 50:
+            old_opp_HPi = 1
+        elif 50 > old_opp_hp >= 75:
+            old_opp_HPi = 2
+        elif 75 > old_opp_hp >= 100:
+            old_opp_HPi = 3
+
+        old_state = (old_NPC_HPi, old_opp_HPi, old_distance_index, self.npc_stmn[old_npc_c_stamina], self.opp_stmn[old_opp_c_stamina], self.NPC_ce_actions[2], self.opp_ce_actions[1], self.opp_ce_actions[2])
+        new_state = (new_NPC_HPi, new_opp_HPi, new_distance_index, self.npc_stmn[npc_c_stamina], self.opp_stmn[opp_c_stamina], self.NPC_ce_actions[3], self.opp_ce_actions[2], self.opp_ce_actions[3])
         # ue.print_string(f"Old State {old_state}, New State {new_state}")
 
         self.calc_reward(new_state, old_state)
@@ -135,7 +175,7 @@ class Game:
     def next_iterator_epsilon(self, name):
         self.iterator += 1
         self.moves_counter = 0
-        self.opp_ce_actions = [23,23,23,23]
+        self.opp_ce_actions = [9,9,9,9]
         self.NPC_ce_actions = [9, 9, 9, 9]
         # ue.print_string(f"MOVES ARE ZEROED YO!!!! {self.moves_counter}")
         if self.iterator % self.decay_every == 0 and self.iterator >= self.decay_from:
@@ -145,22 +185,22 @@ class Game:
         self.save_table(name)
 
     def calc_reward(self, current_state, old_state):
-        if old_state[1] * 5 - current_state[1] * 5 == 0:
+        if old_state[1] * 25 - current_state[1] * 25 == 0:
             self.moves_counter += 1
         action = self.NPC_ce_actions[3]
         succ_dodge = 0
         # ue.print_string(f"player is attacking is {self.is_attacking}")
         if self.is_attacking is True and old_state[2] == 3 and (action == 1 or action == 2 or action == 3) and \
-                old_state[0] * 5 - current_state[0] * 5 == 0:
+                old_state[0] * 25 - current_state[0] * 25 == 0:
             succ_dodge = 5
             # ue.print_string(f"successful dodge {self.is_attacking}")
             # ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
 
-        reward = (old_state[1] * 5 - current_state[1] * 5) - (old_state[0] * 5 - current_state[0] * 5) - (
+        reward = (old_state[1] * 25 - current_state[1] * 25) - (old_state[0] * 25 - current_state[0] * 25) - (
                     self.moves_counter * 0.22) + succ_dodge
         # ue.print_string(f"Reward: {reward}, with action {action} ,#moves {self.moves_counter}")
 
-        if old_state[1] * 5 - current_state[1] * 5 != 0:
+        if old_state[1] * 25 - current_state[1] * 25 != 0:
             self.moves_counter = 0
 
         max_future_q = np.max(self.q_table2[old_state])
