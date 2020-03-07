@@ -14,6 +14,7 @@ class Game:
         # hit_reward = 20
         # hit_penalty = -20
         # move_penalty = -2
+        self.opp_ce_actions = []
         self.episodes = 5000
         self.learn_rate = 0.1
         self.discount = 0.95
@@ -92,11 +93,11 @@ class Game:
         index_state = (p_health, e_health, d_stance)
 
         if np.random.random() > self.epsilon:
-            ue.print_string("Take Max Q_Value")
+            #ue.print_string("Take Max Q_Value")
             action = np.argmax(self.q_table2[index_state])
             # ue.log(f"{self.q_table2[index_state]}")
         else:
-            ue.print_string("Explore: Random Action")
+            #ue.print_string("Explore: Random Action")
             action = np.random.randint(0, 6)
         return action
 
@@ -123,7 +124,7 @@ class Game:
             # ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
 
         reward = (old_state[1] * 5 - current_state[1] * 5) - (old_state[0] * 5 - current_state[0] * 5) - (self.moves_counter * 0.22) + succ_dodge
-        ue.print_string(f"Reward: {reward}, with action {action}, #moves {self.moves_counter}")
+        #ue.print_string(f"Reward: {reward}, with action {action}, #moves {self.moves_counter}")
 
         if old_state[1] * 5 - current_state[1] * 5 != 0:
             self.moves_counter = 0
@@ -133,6 +134,11 @@ class Game:
         new_q = (1 - self.learn_rate) * current_q + self.learn_rate * (reward + self.discount * max_future_q)
         ue.log(f"Current_q {round(current_q, 2)} in state {old_state} and action {action} => New_q {round(new_q, 2) } in state {current_state}")
         self.q_table2[old_state][action] = new_q
+
+    def take_opponent_action(self, action):
+        ue.print_string("Looooooooooooooool")
+        self.opp_ce_actions.append(action)
+        ue.print_string(self.opp_ce_actions)
 
     def save_table(self, name):
         args = name.split(',')
