@@ -34,15 +34,16 @@ class Game:
         # print(q_table2.ndim)
         # print(q_table2.size)
         # print(q_table2.shape)
-        self.q_table2[:, :, :2, :, :, :, :, :, 1:9] = -100  # !Magdi!#
+        self.q_table2[:, :, :2, :, :, :, :, :, 1:9] = -5  # !Magdi!#
         self.q_table2[:, :, :, 0:10, :, :, :, :, 1:4] = -float('inf')
-        self.q_table2[:, :, :, 0:20, :, :, :, :, 4:8] = -float('inf')
-        self.q_table2[:, :, :, 0:30, :, :, :, :, 4:8] = -float('inf')
-        self.q_table2[:, :, :, 0:45, :, :, :, :, 4:8] = -float('inf')
-        self.q_table2[:, :, 0:3, :, :, :, :, :, 0] = 100
-        self.q_table2[:, :, 4, :, :, :, :, :, 4:9] = 100
-        self.q_table2[:, :, 3, :, :, :, :, :, 4:9] = 5
-        self.q_table2[:, :, 2, :, :, :, :, :, 4:9] = 1
+        self.q_table2[:, :, :, 0:20, :, :, :, :, 4] = -float('inf')
+        self.q_table2[:, :, :, 0:30, :, :, :, :, 5] = -float('inf')
+        self.q_table2[:, :, :, 0:30, :, :, :, :, 6] = -float('inf')
+        self.q_table2[:, :, :, 0:40, :, :, :, :, 7] = -float('inf')
+        self.q_table2[:, :, 0:3, :, :, :, :, :, 0] = 5
+        self.q_table2[:, :, 4, :, :, :, :, :, 4:9] = 5
+        self.q_table2[:, :, 3, :, :, :, :, :, 4:9] = 0.5
+        self.q_table2[:, :, 2, :, :, :, :, :, 4:9] = 0.25
         # ue.print_string("Q_Table Class : Constructor")
 
     def intialize_states(self, cur_old_e_o_hp_dist):
@@ -64,8 +65,8 @@ class Game:
             self.is_attacking = False
         npc_c_stamina = L[7]
         opp_c_stamina = L[8]
-        old_npc_c_stamina = L[7]
-        old_opp_c_stamina = L[8]
+        old_npc_c_stamina = L[9]
+        old_opp_c_stamina = L[10]
         # ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon} ,player is attacking is {self.is_attacking}")
         if curr_npc_hp <= 0:
             curr_npc_hp = 0
