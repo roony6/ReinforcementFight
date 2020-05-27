@@ -34,16 +34,16 @@ class Game:
         # print(q_table2.ndim)
         # print(q_table2.size)
         # print(q_table2.shape)
-        self.q_table2[:, :, :2, :, :, :, :, :, 1:9] = -5  # !Magdi!#
-        self.q_table2[:, :, :, 0:10, :, :, :, :, 1:4] = -float('inf')
-        self.q_table2[:, :, :, 0:20, :, :, :, :, 4] = -float('inf')
-        self.q_table2[:, :, :, 0:30, :, :, :, :, 5] = -float('inf')
-        self.q_table2[:, :, :, 0:30, :, :, :, :, 6] = -float('inf')
-        self.q_table2[:, :, :, 0:40, :, :, :, :, 7] = -float('inf')
-        self.q_table2[:, :, 0:3, :, :, :, :, :, 0] = 5
-        self.q_table2[:, :, 4, :, :, :, :, :, 4:9] = 5
-        self.q_table2[:, :, 3, :, :, :, :, :, 4:9] = 0.5
-        self.q_table2[:, :, 2, :, :, :, :, :, 4:9] = 0.25
+        #self.q_table2[:, :, :2, :, :, :, :, :, 1:9] = 0  # !Magdi!#
+        #self.q_table2[:, :, 0:3, :, :, :, :, :, 0] = 5
+        #self.q_table2[:, :, 4, :, :, :, :, :, 4:9] = 5
+        #self.q_table2[:, :, 3, :, :, :, :, :, 4:9] = 0.5
+        #self.q_table2[:, :, 2, :, :, :, :, :, 4:9] = 0.25
+        self.q_table2[:, :, :, 0:1, :, :, :, :, 1:4] = -float('inf')
+        self.q_table2[:, :, :, 0:1, :, :, :, :, 4] = -float('inf')
+        self.q_table2[:, :, :, 0:2, :, :, :, :, 5] = -float('inf')
+        self.q_table2[:, :, :, 0:3, :, :, :, :, 6] = -float('inf')
+        self.q_table2[:, :, :, 0:4, :, :, :, :, 7] = -float('inf')
         # ue.print_string("Q_Table Class : Constructor")
 
     def intialize_states(self, cur_old_e_o_hp_dist):
@@ -68,7 +68,7 @@ class Game:
         opp_c_stamina = int(L[9])
         old_opp_c_stamina = int(L[10])
         self.take_opponent_actions(L[11])
-        # ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon} ,player is attacking is {self.is_attacking}")
+        #ue.print_string(f"curr_npc_hp :=> {curr_npc_hp}, curr_opp_hp :=> {curr_opp_hp} ")
         if curr_npc_hp <= 0:
             curr_npc_hp = 0
         if curr_opp_hp <= 0:
@@ -86,7 +86,6 @@ class Game:
             old_npc_c_stamina = 0
         if opp_c_stamina <= 0:
             old_opp_c_stamina = 0
-
         state = (curr_npc_hp, curr_opp_hp, curr_dist, old_npc_hp, old_opp_hp, old_dist)
         old_distance_index = 0
         if state[5] > 1000:
@@ -115,46 +114,46 @@ class Game:
         new_NPC_HPi = 0
         if curr_npc_hp <= 25:
             new_NPC_HPi = 0
-        elif 25 > curr_npc_hp >= 50:
+        elif 50 >= curr_npc_hp > 25:
             new_NPC_HPi = 1
-        elif 50 > curr_npc_hp >= 75:
+        elif 75 >= curr_npc_hp > 50:
             new_NPC_HPi = 2
-        elif 75 > curr_npc_hp >= 100:
+        elif 100 >= curr_npc_hp > 75:
             new_NPC_HPi = 3
 
         old_NPC_HPi = 0
         if old_npc_hp <= 25:
             old_NPC_HPi = 0
-        elif 25 > old_npc_hp >= 50:
+        elif 50 >= old_npc_hp > 25:
             old_NPC_HPi = 1
-        elif 50 > old_npc_hp >= 75:
+        elif 75 >= old_npc_hp > 50:
             old_NPC_HPi = 2
-        elif 75 > old_npc_hp >= 100:
+        elif 100 >= old_npc_hp > 75:
             old_NPC_HPi = 3
 
         new_opp_HPi = 0
         if curr_opp_hp <= 25:
             new_opp_HPi = 0
-        elif 25 > curr_opp_hp >= 50:
+        elif 50 >= curr_opp_hp > 25:
             new_opp_HPi = 1
-        elif 50 > curr_opp_hp >= 75:
+        elif 75 >= curr_opp_hp > 50:
             new_opp_HPi = 2
-        elif 75 > curr_opp_hp >= 100:
+        elif 100 >= curr_opp_hp > 75:
             new_opp_HPi = 3
 
         old_opp_HPi = 0
         if old_opp_hp <= 25:
             old_opp_HPi = 0
-        elif 25 > old_opp_hp >= 50:
+        elif 50 >= old_opp_hp > 25:
             old_opp_HPi = 1
-        elif 50 > old_opp_hp >= 75:
+        elif 75 >= old_opp_hp > 50:
             old_opp_HPi = 2
-        elif 75 > old_opp_hp >= 100:
+        elif 100 >= old_opp_hp > 75:
             old_opp_HPi = 3
 
         old_state = (old_NPC_HPi, old_opp_HPi, old_distance_index, self.npc_stmn[old_npc_c_stamina], self.opp_stmn[old_opp_c_stamina], self.NPC_ce_actions[2], self.opp_ce_actions[1], self.opp_ce_actions[2])
         new_state = (new_NPC_HPi, new_opp_HPi, new_distance_index,self.npc_stmn[npc_c_stamina], self.opp_stmn[opp_c_stamina], self.NPC_ce_actions[3], self.opp_ce_actions[2], self.opp_ce_actions[3])
-        # ue.print_string(f"Old State {old_state}, New State {new_state}")
+        ue.print_string(f"Old State {old_state}, New State {new_state}")
 
         self.calc_reward(new_state, old_state)
         action = self.take_action(new_state)
@@ -191,12 +190,12 @@ class Game:
             self.moves_counter += 1
         action = self.NPC_ce_actions[3]
         succ_dodge = 0
-        # ue.print_string(f"player is attacking is {self.is_attacking}")
+        #ue.print_string(f"moves counter =  {self.moves_counter}")
         if self.is_attacking is True and old_state[2] == 3 and (action == 1 or action == 2 or action == 3) and \
                 old_state[0] * 25 - current_state[0] * 25 == 0:
             succ_dodge = 5
             # ue.print_string(f"successful dodge {self.is_attacking}")
-            # ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
+            ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
 
         reward = (old_state[1] * 25 - current_state[1] * 25) - (old_state[0] * 25 - current_state[0] * 25) - (
                     self.moves_counter * 0.22) + succ_dodge
@@ -205,9 +204,9 @@ class Game:
         if old_state[1] * 25 - current_state[1] * 25 != 0:
             self.moves_counter = 0
 
-        max_future_q = np.max(self.q_table2[old_state])
+        old_state_max_q = np.max(self.q_table2[old_state])
         current_q = self.q_table2[old_state][action]
-        new_q = (1 - self.learn_rate) * current_q + self.learn_rate * (reward + self.discount * max_future_q)
+        new_q = (1 - self.learn_rate) * current_q + self.learn_rate * (reward + self.discount * old_state_max_q)
         ue.log(f"Current_q {current_q} in state {old_state} and action {action} => New_q {new_q} in state {current_state}")
         ue.print_string(f"Current_q {current_q} in state {old_state} and action {action} => New_q {new_q} in state {current_state}")
         self.q_table2[old_state][action] = new_q
