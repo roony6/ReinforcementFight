@@ -30,6 +30,23 @@ class Game:
         self.iterator = 0
         self.moves_counter = 0
         self.is_attacking = False
+        ##self.q_table2 = np.random.uniform(low=0, high=5, size=(len(self.npc_hps), len(self.opp_hps), len(self.distances), len(self.npc_stmn), len(self.opp_stmn), len(self.actions), len(self.opponent_actions), len(self.opponent_actions), len(self.actions)))
+        # print(q_table2.ndim)
+        # print(q_table2.size)
+        # print(q_table2.shape)
+        #self.q_table2[:, :, :2, :, :, :, :, :, 1:9] = 0  # !Magdi!#
+        #self.q_table2[:, :, 0:3, :, :, :, :, :, 0] = 5
+        #self.q_table2[:, :, 4, :, :, :, :, :, 4:9] = 5
+        #self.q_table2[:, :, 3, :, :, :, :, :, 4:9] = 0.5
+        #self.q_table2[:, :, 2, :, :, :, :, :, 4:9] = 0.25
+        ##self.q_table2[:, :, :, 0:1, :, :, :, :, 1:4] = -float('inf')
+        ##self.q_table2[:, :, :, 0:1, :, :, :, :, 4] = -float('inf')
+        ##self.q_table2[:, :, :, 0:2, :, :, :, :, 5] = -float('inf')
+        ##self.q_table2[:, :, :, 0:3, :, :, :, :, 6] = -float('inf')
+        ##self.q_table2[:, :, :, 0:4, :, :, :, :, 7] = -float('inf')
+        # ue.print_string("Q_Table Class : Constructor")
+        
+    def begin_play():
         self.q_table2 = np.random.uniform(low=0, high=5, size=(len(self.npc_hps), len(self.opp_hps), len(self.distances), len(self.npc_stmn), len(self.opp_stmn), len(self.actions), len(self.opponent_actions), len(self.opponent_actions), len(self.actions)))
         # print(q_table2.ndim)
         # print(q_table2.size)
