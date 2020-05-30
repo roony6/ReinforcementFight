@@ -45,8 +45,8 @@ class Game:
         ##self.q_table2[:, :, :, 0:3, :, :, :, :, 6] = -float('inf')
         ##self.q_table2[:, :, :, 0:4, :, :, :, :, 7] = -float('inf')
         # ue.print_string("Q_Table Class : Constructor")
-        
-    def begin_play():
+    
+    def create_table(self):
         self.q_table2 = np.random.uniform(low=0, high=5, size=(len(self.npc_hps), len(self.opp_hps), len(self.distances), len(self.npc_stmn), len(self.opp_stmn), len(self.actions), len(self.opponent_actions), len(self.opponent_actions), len(self.actions)))
         # print(q_table2.ndim)
         # print(q_table2.size)
@@ -61,13 +61,12 @@ class Game:
         self.q_table2[:, :, :, 0:2, :, :, :, :, 5] = -float('inf')
         self.q_table2[:, :, :, 0:3, :, :, :, :, 6] = -float('inf')
         self.q_table2[:, :, :, 0:4, :, :, :, :, 7] = -float('inf')
-        # ue.print_string("Q_Table Class : Constructor")
-
+       
     def intialize_states(self, cur_old_e_o_hp_dist):
         ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
         if self.iterator == self.episodes:
             return -1
-
+        ue.print_string(f"Iterator :=> {len(self.q_table2)}")
         L = cur_old_e_o_hp_dist.split(',')
         curr_npc_hp = int(L[0])
         curr_opp_hp = int(L[1])
