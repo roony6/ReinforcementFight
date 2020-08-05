@@ -17,12 +17,12 @@
   "Modules": [
     {
       "Name": "UnrealEnginePython",
-      "Type": "Editor",
+      "Type": "runtime",
       "LoadingPhase": "Default"
     },
     {
       "Name": "PythonAutomation",
-      "Type": "Editor",
+      "Type": "runtime",
       "LoadingPhase": "PostDefault"
     },
     {
