@@ -223,9 +223,11 @@ class Game:
             succ_dodge = 5
             ue.print_string(f"successful dodge , with action {action},#moves {self.moves_counter}")
             ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
+        if action ==0:
+            reward = (old_state[1] * 25 - current_state[1] * 25) - (old_state[0] * 25 - current_state[0] * 25)
+        else :
+            reward = (old_state[1] * 25 - current_state[1] * 25) - (old_state[0] * 25 - current_state[0] * 25) - (self.moves_counter * 0.22) + succ_dodge
 
-        reward = (old_state[1] * 25 - current_state[1] * 25) - (old_state[0] * 25 - current_state[0] * 25) - (
-                    self.moves_counter * 0.22) + succ_dodge
         ue.print_string(f"Reward: {reward}, with action {action} ,#moves {self.moves_counter}")
 
         if old_state[1] * 25 - current_state[1] * 25 != 0:
