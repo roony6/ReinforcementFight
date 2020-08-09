@@ -11,6 +11,7 @@ class Game:
         self.distances = {0: '2000 - 800', 1: '800 - 500', 2: '500 - 200', 3: '200 - 0'}
         self.NPC_wins = 0
         self.opp_wins = 0
+        self.winning_rate = []
         # hit_reward = 20
         # hit_penalty = -20
         # move_penalty = -2
@@ -105,6 +106,7 @@ class Game:
         ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
         self.iterator += 1
         self.moves_counter = 0
+        self.winning_rate.append((self.NPC_wins/(self.opp_wins+self.NPC_wins))*100)
         # ue.print_string(f"MOVES ARE ZEROED YO!!!! {self.moves_counter}")
         if self.iterator % self.decay_every == 0 and self.iterator >= self.decay_from:
             self.epsilon *= self.eps_decay
