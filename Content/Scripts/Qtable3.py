@@ -206,8 +206,6 @@ class Game:
         self.moves_counter = 0
         self.opp_ce_actions = [9, 9, 9, 9]
         self.NPC_ce_actions = [9, 9, 9, 9]
-        self.winning_rate.append((self.NPC_wins / (self.opp_wins + self.NPC_wins)) * 100)
-        ue.log(f"self.winning_rate = {self.winning_rate}")
         # ue.print_string(f"MOVES ARE ZEROED YO!!!! {self.moves_counter}")
         if self.iterator % self.decay_every == 0 and self.iterator >= self.decay_from:
             self.epsilon *= self.eps_decay
@@ -260,6 +258,8 @@ class Game:
         args = name.split(',')
         self.NPC_wins = int(args[1])
         self.opp_wins = int(args[2])
+        self.winning_rate.append((self.NPC_wins / (self.opp_wins + self.NPC_wins)) * 100)
+        ue.log(f"winning_rate = {self.winning_rate}")
         filename = rf'./Q_Table{args[0]}.pickle'
         with open(filename, 'wb') as f:
             pickle.dump(self.q_table2, f)
