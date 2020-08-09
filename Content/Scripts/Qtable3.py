@@ -207,6 +207,7 @@ class Game:
         self.opp_ce_actions = [9, 9, 9, 9]
         self.NPC_ce_actions = [9, 9, 9, 9]
         self.winning_rate.append((self.NPC_wins / (self.opp_wins + self.NPC_wins)) * 100)
+        ue.log(f"self.winning_rate = {self.winning_rate}")
         # ue.print_string(f"MOVES ARE ZEROED YO!!!! {self.moves_counter}")
         if self.iterator % self.decay_every == 0 and self.iterator >= self.decay_from:
             self.epsilon *= self.eps_decay

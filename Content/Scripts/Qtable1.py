@@ -107,6 +107,7 @@ class Game:
         self.iterator += 1
         self.moves_counter = 0
         self.winning_rate.append((self.NPC_wins/(self.opp_wins+self.NPC_wins))*100)
+        ue.log(f"self.winning_rate = {self.winning_rate}")
         # ue.print_string(f"MOVES ARE ZEROED YO!!!! {self.moves_counter}")
         if self.iterator % self.decay_every == 0 and self.iterator >= self.decay_from:
             self.epsilon *= self.eps_decay
@@ -151,7 +152,7 @@ class Game:
             pickle.dump(self.q_table2, f)
 
             ue.print_string(f"{self.iterator} : Saved Q_Table")
-        es = (self.iterator, self.epsilon,self.NPC_wins,self.opp_wins)
+        es = (self.iterator, self.epsilon,self.NPC_wins,self.opp_wins,self.winning_rate)
         filename = rf'./Episode{args[0]}.pickle'
         with open(filename, 'wb') as f:
             pickle.dump(es, f)
@@ -170,6 +171,7 @@ class Game:
             self.epsilon = es[1]
             self.NPC_wins = es[2]
             self.opp_wins = es[3]
+            self.winning_rate = es[4]
             ue.print_string(f"{self.iterator} : #Episodes is loaded")
             itr_n_o_wins = f"{self.iterator},{self.NPC_wins},{self.opp_wins}"
         return itr_n_o_wins
