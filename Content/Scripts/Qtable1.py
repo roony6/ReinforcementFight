@@ -115,7 +115,7 @@ class Game:
             self.epsilon *= self.eps_decay
             ue.print_string("DECAY")
 
-        self.save_table(name)
+    #    self.save_table(name)
         
     def calc_reward(self, current_state, old_state):
         if old_state[1] * 5 - current_state[1] * 5 == 0:
