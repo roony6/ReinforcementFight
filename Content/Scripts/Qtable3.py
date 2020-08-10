@@ -258,7 +258,7 @@ class Game:
         args = name.split(',')
         self.NPC_wins = int(args[1])
         self.opp_wins = int(args[2])
-        self.winning_rate.append((self.NPC_wins / (self.opp_wins + self.NPC_wins)) * 100)
+        self.winning_rate.append((self.NPC_wins / (self.iterator) * 100)
         ue.log(f"winning_rate = {self.winning_rate}")
         filename = rf'./Q_Table{args[0]}.pickle'
         with open(filename, 'wb') as f:
