@@ -12,6 +12,13 @@ class Game:
         self.NPC_wins = 0
         self.opp_wins = 0
         self.winning_rate = []
+        self.d_taken = []
+        self.dmg_taken = 0
+        self.d_dealt = []
+        self.dmg_dealt = 0
+        self.move_to_q = []
+        self.attack_q = []
+        self.dodge_q = []
         # hit_reward = 20
         # hit_penalty = -20
         # move_penalty = -2
@@ -107,6 +114,17 @@ class Game:
     def next_iterator_epsilon(self, name):
         ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
         self.iterator += 1
+        args = name.split(',')
+        self.NPC_wins = int(args[1])
+        self.opp_wins = int(args[2])
+        self.winning_rate.append((self.NPC_wins / (self.iterator) * 100))
+        self.move_to_q.append(np.max(self.q_table2[0, :, :, 0]))
+        self.attack_q.append(np.min(self.q_table2[0, :, :, 4]))
+        self.dodge_q.append(np.min(self.q_table2[0, :, :, 3]))
+        self.d_dealt.append(self.dmg_dealt)
+        self.d_taken.append(self.dmg_taken)
+        self.dmg_dealt = 0
+        self.dmg_taken = 0
         self.moves_counter = 0
         # ue.print_string(f"MOVES ARE ZEROED YO!!!! {self.moves_counter}")
         if self.iterator % self.decay_every == 0 and self.iterator >= self.decay_from:
@@ -118,6 +136,11 @@ class Game:
     def calc_reward(self, current_state, old_state):
         if old_state[1] * 5 - current_state[1] * 5 == 0:
             self.moves_counter += 1
+        else :
+            self.dmg_dealt += old_state[1] * 25 - current_state[1] * 25
+        if old_state[0] * 25 - current_state[0] * 25 != 0:
+            self.dmg_taken += old_state[0] * 25 - current_state[0] * 25
+            
         action = self.take_action(old_state[0], old_state[1], old_state[2])
         succ_dodge = 0
         # ue.print_string(f"player is attacking is {self.is_attacking}")
@@ -144,14 +167,13 @@ class Game:
         self.opp_wins = int(args[2])
         if self.iterator != 0:
             ue.log(f"iterartor = {self.iterator}")
-            self.winning_rate.append((self.NPC_wins / (self.iterator) * 100))
             ue.log(f"self.winning_rate = {self.winning_rate}")
             filename = rf'./Q_Table{args[0]}.pickle'
             with open(filename, 'wb') as f:
                 pickle.dump(self.q_table2, f)
 
                 ue.print_string(f"{self.iterator} : Saved Q_Table")
-            es = (self.iterator, self.epsilon, self.NPC_wins, self.opp_wins, self.winning_rate)
+            es = (self.iterator, self.epsilon, self.NPC_wins, self.opp_wins, self.winning_rate, self.d_taken, self.d_dealt, self.move_to_q, self.attack_q, self.dodge_q)
             filename = rf'./Episode{args[0]}.pickle'
             with open(filename, 'wb') as f:
                 pickle.dump(es, f)
@@ -173,6 +195,10 @@ class Game:
             self.NPC_wins = es[2]
             self.opp_wins = es[3]
             self.winning_rate = es[4]
+            self.d_taken = es[5]
+            self.d_dealt = es[6]
+            self.attack_q = es[7]
+            self.dodge_q = es[8]
             ue.print_string(f"{self.iterator} : #Episodes is loaded")
             itr_n_o_wins = f"{self.iterator},{self.NPC_wins},{self.opp_wins}"
         return itr_n_o_wins

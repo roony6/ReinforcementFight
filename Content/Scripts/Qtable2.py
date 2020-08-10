@@ -16,6 +16,13 @@ class Game:
         self.NPC_wins = 0
         self.opp_wins = 0
         self.winning_rate = []
+        self.d_taken = []
+        self.dmg_taken = 0
+        self.d_dealt = []
+        self.dmg_dealt = 0
+        self.move_to_q = []
+        self.attack_q = []
+        self.dodge_q = []
         self.opp_ce_actions = [9, 9, 9, 9]
         self.NPC_ce_actions = [9, 9, 9, 9]
         # hit_reward = 20
@@ -193,6 +200,17 @@ class Game:
 
     def next_iterator_epsilon(self, name):
         self.iterator += 1
+        args = name.split(',')
+        self.NPC_wins = int(args[1])
+        self.opp_wins = int(args[2])
+        self.winning_rate.append((self.NPC_wins / (self.iterator) * 100))
+        self.move_toq.append(np.max(self.q_table2[0, :, :, :, :, :, :, :, 0]))
+        self.move_toq.append(np.min(self.q_table2[0, :, :, :, :, :, :, :, 4]))
+        self.move_toq.append(np.min(self.q_table2[0, :, :, :, :, :, :, :, 3]))
+        self.d_dealt.append(self.dmg_dealt)
+        self.d_taken.append(self.dmg_taken)
+        self.dmg_dealt = 0
+        self.dmg_taken = 0
         self.moves_counter = 0
         self.opp_ce_actions = [9, 9, 9, 9]
         self.NPC_ce_actions = [9, 9, 9, 9]
@@ -206,6 +224,11 @@ class Game:
     def calc_reward(self, current_state, old_state): #fe h5a
         if old_state[1] * 25 - current_state[1] * 25 == 0:
             self.moves_counter += 1
+        else :
+            self.dmg_dealt += old_state[1] * 25 - current_state[1] * 25
+        if old_state[0] * 25 - current_state[0] * 25 != 0:
+            self.dmg_taken += old_state[0] * 25 - current_state[0] * 25
+
         action = self.NPC_ce_actions[3]
         succ_dodge = 0
         #ue.print_string(f"moves counter =  {self.moves_counter}")
@@ -247,14 +270,13 @@ class Game:
         self.NPC_wins = int(args[1])
         self.opp_wins = int(args[2])
         if self.iterator != 0:
-            self.winning_rate.append((self.NPC_wins / (self.iterator) * 100))
             ue.log(f"self.winning_rate = {self.winning_rate}")
             filename = rf'./Q_Table{args[0]}.pickle'
             with open(filename, 'wb') as f:
                 pickle.dump(self.q_table2, f)
 
                 ue.print_string(f"{self.iterator} : Saved Q_Table")
-            es = (self.iterator, self.epsilon, self.NPC_wins, self.opp_wins, self.winning_rate)
+            es = (self.iterator, self.epsilon, self.NPC_wins, self.opp_wins, self.winning_rate, self.d_taken, self.d_dealt, self.move_to_q, self.attack_q, self.dodge_q)
             filename = rf'./Episode{args[0]}.pickle'
             with open(filename, 'wb') as f:
                 pickle.dump(es, f)
@@ -276,6 +298,10 @@ class Game:
             self.NPC_wins = es[2]
             self.opp_wins = es[3]
             self.winning_rate = es[4]
+            self.d_taken = es[5]
+            self.d_dealt = es[6]
+            self.attack_q = es[7]
+            self.dodge_q = es[8]
             ue.print_string(f"{self.iterator} : #Episodes is loaded")
             #ue.log(f"{self.q_table2[:, :, :, 4]}")
             str = f"{self.iterator},{self.NPC_wins},{self.opp_wins}"
