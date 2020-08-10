@@ -12,11 +12,8 @@ class Game:
         self.NPC_wins = 0
         self.opp_wins = 0
         self.winning_rate = []
-        # hit_reward = 20
-        # hit_penalty = -20
-        # move_penalty = -2
         self.opp_ce_actions = []
-        self.episodes = 5000
+        self.episodes = 2000
         self.learn_rate = 0.1
         self.discount = 0.95
         self.epsilon = 0.9
@@ -27,18 +24,10 @@ class Game:
         self.moves_counter = 0
         self.is_attacking = False
         self.q_table2 = np.random.uniform(low=0, high=5, size=(len(self.npc_hps), len(self.opp_hps), len(self.distances), len(self.actions)))
-        # print(q_table2.ndim)
-        # print(q_table2.size)
-        # print(q_table2.shape)
-        self.q_table2[:, :, :2, 4] = -100 #!Magdi!#
+        self.q_table2[:, :, :2, 4] = -100
         self.q_table2[:, :, 3, 4] = 5
         self.q_table2[:, :, 2, 4] = 1
-        # ue.print_string("Q_Table Class : Constructor")
 
-    def intialize_states(self):
-        action = self.take_action()
-        return action
-
-    def take_action():
-            action = np.random.randint(0, 6)
+    def take_action(self):
+        action = np.random.randint(0, 6)
         return action

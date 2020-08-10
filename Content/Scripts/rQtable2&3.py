@@ -18,7 +18,7 @@ class Game:
         self.winning_rate = []
         self.opp_ce_actions = [9, 9, 9, 9]
         self.NPC_ce_actions = [9, 9, 9, 9]
-        self.episodes = 700
+        self.episodes = 2000
         self.learn_rate = 0.1
         self.discount = 0.95
         self.epsilon = 0.9
@@ -29,10 +29,6 @@ class Game:
         self.moves_counter = 0
         self.is_attacking = False
 
-    def intialize_states(self):
-        action = self.take_action(new_state)
-        return action
-
-    def take_action(self, index_state):
+    def take_action(self):
         action = np.random.randint(0, 9)
         return action

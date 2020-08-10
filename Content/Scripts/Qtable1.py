@@ -16,7 +16,7 @@ class Game:
         # hit_penalty = -20
         # move_penalty = -2
         self.opp_ce_actions = []
-        self.episodes = 5000
+        self.episodes = 2000
         self.learn_rate = 0.1
         self.discount = 0.95
         self.epsilon = 0.9
@@ -26,6 +26,9 @@ class Game:
         self.iterator = 0
         self.moves_counter = 0
         self.is_attacking = False
+        self.name = ""
+
+    def create_table(self,name)
         self.q_table2 = np.random.uniform(low=0, high=5, size=(len(self.npc_hps), len(self.opp_hps), len(self.distances), len(self.actions)))
         # print(q_table2.ndim)
         # print(q_table2.size)
@@ -33,6 +36,7 @@ class Game:
         self.q_table2[:, :, :2, 4] = -100 #!Magdi!#
         self.q_table2[:, :, 3, 4] = 5
         self.q_table2[:, :, 2, 4] = 1
+        self.name = name
         # ue.print_string("Q_Table Class : Constructor")
 
     def intialize_states(self, cur_old_e_o_hp_dist):
@@ -136,16 +140,13 @@ class Game:
         ue.log(f"Current_q {round(current_q, 2)} in state {old_state} and action {action} => New_q {round(new_q, 2) } in state {current_state}")
         self.q_table2[old_state][action] = new_q
 
-    def take_opponent_action(self, action):
-        ue.print_string("Looooooooooooooool")
-        self.opp_ce_actions.append(action)
-        ue.print_string(self.opp_ce_actions)
-
     def save_table(self, name):
         args = name.split(',')
         self.NPC_wins = int(args[1])
         self.opp_wins = int(args[2])
-        self.winning_rate.append((self.NPC_wins /self.iterator) * 100)
+        if self.iterator != 0:
+            ue.log(f"iterartor = {self.iterator}")
+            self.winning_rate.append((self.NPC_wins / (self.iterator) * 100))
         ue.log(f"self.winning_rate = {self.winning_rate}")
         filename = rf'./Q_Table{args[0]}.pickle'
         with open(filename, 'wb') as f:
@@ -159,6 +160,7 @@ class Game:
             ue.log(f"{self.iterator} : Saved Episode , winning rate : {(self.NPC_wins/self.iterator)*100}")
 
     def load_table(self, name):
+        self.name = name
         filename = rf'./Q_Table{name}.pickle'
         with open(filename, 'rb') as f:
             self.q_table2 = pickle.load(f)
@@ -175,3 +177,8 @@ class Game:
             ue.print_string(f"{self.iterator} : #Episodes is loaded")
             itr_n_o_wins = f"{self.iterator},{self.NPC_wins},{self.opp_wins}"
         return itr_n_o_wins
+
+    def __del__(self):
+        ue.log("destructooooooooooooooooooooooooooooooooooooooooooor xD ")
+        self.save_table(f"{self.name},{self.NPC_wins},{self.opp_wins}")
+        del self.q_table2
