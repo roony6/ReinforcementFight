@@ -28,16 +28,14 @@ class Game:
         self.is_attacking = False
         self.name = ""
 
-    def create_table(self,name)
+
+    def create_table(self,name):
         self.q_table2 = np.random.uniform(low=0, high=5, size=(len(self.npc_hps), len(self.opp_hps), len(self.distances), len(self.actions)))
-        # print(q_table2.ndim)
-        # print(q_table2.size)
-        # print(q_table2.shape)
-        self.q_table2[:, :, :2, 4] = -100 #!Magdi!#
+        self.q_table2[:, :, :2, 4] = -100
         self.q_table2[:, :, 3, 4] = 5
         self.q_table2[:, :, 2, 4] = 1
         self.name = name
-        # ue.print_string("Q_Table Class : Constructor")
+
 
     def intialize_states(self, cur_old_e_o_hp_dist):
         if self.iterator == self.episodes:
@@ -147,17 +145,18 @@ class Game:
         if self.iterator != 0:
             ue.log(f"iterartor = {self.iterator}")
             self.winning_rate.append((self.NPC_wins / (self.iterator) * 100))
-        ue.log(f"self.winning_rate = {self.winning_rate}")
-        filename = rf'./Q_Table{args[0]}.pickle'
-        with open(filename, 'wb') as f:
-            pickle.dump(self.q_table2, f)
+            ue.log(f"self.winning_rate = {self.winning_rate}")
+            filename = rf'./Q_Table{args[0]}.pickle'
+            with open(filename, 'wb') as f:
+                pickle.dump(self.q_table2, f)
 
-            ue.print_string(f"{self.iterator} : Saved Q_Table")
-        es = (self.iterator, self.epsilon,self.NPC_wins,self.opp_wins,self.winning_rate)
-        filename = rf'./Episode{args[0]}.pickle'
-        with open(filename, 'wb') as f:
-            pickle.dump(es, f)
-            ue.log(f"{self.iterator} : Saved Episode , winning rate : {(self.NPC_wins/self.iterator)*100}")
+                ue.print_string(f"{self.iterator} : Saved Q_Table")
+            es = (self.iterator, self.epsilon, self.NPC_wins, self.opp_wins, self.winning_rate)
+            filename = rf'./Episode{args[0]}.pickle'
+            with open(filename, 'wb') as f:
+                pickle.dump(es, f)
+                ue.log(f"{self.iterator} : Saved Episode , winning rate : {(self.NPC_wins / self.iterator) * 100}")
+       
 
     def load_table(self, name):
         self.name = name
