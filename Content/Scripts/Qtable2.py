@@ -54,8 +54,9 @@ class Game:
         ##self.q_table2[:, :, :, 0:3, :, :, :, :, 6] = -float('inf')
         ##self.q_table2[:, :, :, 0:4, :, :, :, :, 7] = -float('inf')
         # ue.print_string("Q_Table Class : Constructor")
-    
-    def create_table(self,name):
+
+    def create_table(self, name):
+        ue.log("Creating Table")
         self.name = name
         self.q_table2 = np.random.uniform(low=0, high=5, size=(len(self.npc_hps), len(self.opp_hps), len(self.distances), len(self.npc_stmn), len(self.opp_stmn), len(self.actions), len(self.opponent_actions), len(self.opponent_actions), len(self.actions)))
         # print(q_table2.ndim)
@@ -71,7 +72,7 @@ class Game:
         self.q_table2[:, :, :, 0:3, :, :, :, :, 5] = -float('inf')
         self.q_table2[:, :, :, 0:4, :, :, :, :, 6] = -float('inf')
         self.q_table2[:, :, :, 0:3, :, :, :, :, 7] = -float('inf')
-       
+
     def intialize_states(self, cur_old_e_o_hp_dist):
         ue.print_string(f"Iterator :=> {self.iterator}, Epsilon :=> {self.epsilon}")
         if self.iterator == self.episodes:
@@ -83,7 +84,7 @@ class Game:
         old_npc_hp = int(L[3])
         old_opp_hp = int(L[4])
         old_dist = int(L[5])
-        #self.opp_ce_actions.append(L[6])
+        # self.opp_ce_actions.append(L[6])
         if L[6] == "true":
             self.is_attacking = True
         else:
@@ -174,7 +175,7 @@ class Game:
             old_opp_HPi = 3
 
         old_state = (old_NPC_HPi, old_opp_HPi, old_distance_index, self.npc_stmn[old_npc_c_stamina], self.opp_stmn[old_opp_c_stamina], self.NPC_ce_actions[2], self.opp_ce_actions[1], self.opp_ce_actions[2])
-        new_state = (new_NPC_HPi, new_opp_HPi, new_distance_index,self.npc_stmn[npc_c_stamina], self.opp_stmn[opp_c_stamina], self.NPC_ce_actions[3], self.opp_ce_actions[2], self.opp_ce_actions[3])
+        new_state = (new_NPC_HPi, new_opp_HPi, new_distance_index, self.npc_stmn[npc_c_stamina], self.opp_stmn[opp_c_stamina], self.NPC_ce_actions[3], self.opp_ce_actions[2], self.opp_ce_actions[3])
         ue.print_string(f"Old State {old_state}, New State {new_state}")
 
         self.calc_reward(new_state, old_state)
@@ -204,9 +205,9 @@ class Game:
         self.NPC_wins = int(args[1])
         self.opp_wins = int(args[2])
         self.winning_rate.append((self.NPC_wins / (self.iterator) * 100))
-        self.move_toq.append(np.max(self.q_table2[0, :, :, :, :, :, :, :, 0]))
-        self.move_toq.append(np.min(self.q_table2[0, :, :, :, :, :, :, :, 4]))
-        self.move_toq.append(np.min(self.q_table2[0, :, :, :, :, :, :, :, 3]))
+        self.move_to_q.append(np.max(self.q_table2[0, :, :, :, :, :, :, :, 0]))
+        self.attack_q.append(np.min(self.q_table2[0, :, :, :, :, :, :, :, 4]))
+        self.dodge_q.append(np.min(self.q_table2[0, :, :, :, :, :, :, :, 3]))
         self.d_dealt.append(self.dmg_dealt)
         self.d_taken.append(self.dmg_taken)
         self.dmg_dealt = 0
@@ -219,12 +220,12 @@ class Game:
             self.epsilon *= self.eps_decay
             ue.print_string("DECAY")
 
-        #self.save_table(name)
+        # self.save_table(name)
 
-    def calc_reward(self, current_state, old_state): #fe h5a
+    def calc_reward(self, current_state, old_state):  # fe h5a
         if old_state[1] * 25 - current_state[1] * 25 == 0:
             self.moves_counter += 1
-        else :
+        else:
             self.dmg_dealt += old_state[1] * 25 - current_state[1] * 25
         if old_state[0] * 25 - current_state[0] * 25 != 0:
             self.dmg_taken += old_state[0] * 25 - current_state[0] * 25
@@ -239,7 +240,7 @@ class Game:
             ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
 
         reward = (old_state[1] * 25 - current_state[1] * 25) - (old_state[0] * 25 - current_state[0] * 25) - (
-                    self.moves_counter * 0.22) + succ_dodge
+            self.moves_counter * 0.22) + succ_dodge
         ue.print_string(f"Reward: {reward}, with action {action} ,#moves {self.moves_counter}")
 
         if old_state[1] * 25 - current_state[1] * 25 != 0:
@@ -282,32 +283,37 @@ class Game:
                 pickle.dump(es, f)
                 ue.log(f"{self.iterator} : Saved Episode , winning rate : {(self.NPC_wins / self.iterator) * 100}")
 
-
     def load_table(self, name):
         self.name = name
-        filename = rf'./Q_Table{name}.pickle'
-        with open(filename, 'rb') as f:
-            self.q_table2 = pickle.load(f)
+        try:
+            filename = rf'./Q_Table{name}.pickle'
+            with open(filename, 'rb') as f:
+                self.q_table2 = pickle.load(f)
 
-            ue.print_string(f"{self.iterator} : Q_Table is loaded")
-        filename = rf'./Episode{name}.pickle'
-        with open(filename, 'rb') as f:
-            es = pickle.load(f)
-            self.iterator = es[0]
-            self.epsilon = es[1]
-            self.NPC_wins = es[2]
-            self.opp_wins = es[3]
-            self.winning_rate = es[4]
-            self.d_taken = es[5]
-            self.d_dealt = es[6]
-            self.attack_q = es[7]
-            self.dodge_q = es[8]
-            ue.print_string(f"{self.iterator} : #Episodes is loaded")
-            #ue.log(f"{self.q_table2[:, :, :, 4]}")
-            str = f"{self.iterator},{self.NPC_wins},{self.opp_wins}"
-        return str
+                ue.print_string(f"{self.iterator} : Q_Table is loaded")
+            filename = rf'./Episode{name}.pickle'
+            with open(filename, 'rb') as f:
+                es = pickle.load(f)
+                self.iterator = es[0]
+                self.epsilon = es[1]
+                self.NPC_wins = es[2]
+                self.opp_wins = es[3]
+                self.winning_rate = es[4]
+                self.d_taken = es[5]
+                self.d_dealt = es[6]
+                self.attack_q = es[7]
+                self.dodge_q = es[8]
+                ue.print_string(f"{self.iterator} : #Episodes is loaded")
+                #ue.log(f"{self.q_table2[:, :, :, 4]}")
+                str = f"{self.iterator},{self.NPC_wins},{self.opp_wins}"
+            return str
+        except:
+            self.create_table(name)
 
     def __del__(self):
-        ue.log("destructooooooooooooooooooooooooooooooooooooooooooor xD ")
-        self.save_table(f"{self.name},{self.NPC_wins},{self.opp_wins}")
-        del self.q_table2
+        try:
+            self.save_table(f"{self.name},{self.NPC_wins},{self.opp_wins}")
+            del self.q_table2
+            ue.log("destructooooooooooooooooooooooooooooooooooooooooooor Table Deleted")
+        except:
+            ue.log("Destructor is failed")
