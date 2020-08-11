@@ -236,6 +236,13 @@ class Game:
             ue.print_string("DECAY")
     #    self.save_table(name)
 
+    def final_damage(self, d_lsit):
+        dl = d_list.split(',')
+        d_tkn = dl[0] - dl[1]
+        d_dlt = dl[2] - dl[3]
+        self.d_dealt[-1] += d_dlt
+        self.d_taken[-1] += d_tkn
+
     def calc_reward(self, current_state, old_state):  # fe h5a
         if old_state[1] * 25 - current_state[1] * 25 == 0:
             self.moves_counter += 1

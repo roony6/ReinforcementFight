@@ -132,6 +132,13 @@ class Game:
 
     #    self.save_table(name)
 
+    def final_damage(self, d_lsit):
+        dl = d_list.split(',')
+        d_tkn = dl[0] - dl[1]
+        d_dlt = dl[2] - dl[3]
+        self.d_dealt[-1] += d_dlt
+        self.d_taken[-1] += d_tkn
+
     def calc_reward(self, current_state, old_state):
         if old_state[1] * 5 - current_state[1] * 5 == 0:
             self.moves_counter += 1
@@ -202,7 +209,7 @@ class Game:
                 itr_n_o_wins = f"{self.iterator},{self.NPC_wins},{self.opp_wins}"
                 return itr_n_o_wins
         except:
-            create_table(name)
+            self.create_table(name)
 
     def __del__(self):
         try:
