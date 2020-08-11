@@ -202,7 +202,7 @@ class Game:
                 itr_n_o_wins = f"{self.iterator},{self.NPC_wins},{self.opp_wins}"
                 return itr_n_o_wins
         except:
-            create_table(name)
+            self.create_table(name)
 
     def __del__(self):
         try:
