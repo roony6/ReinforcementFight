@@ -254,7 +254,7 @@ class Game:
         succ_dodge = 0
         #ue.print_string(f"moves counter =  {self.moves_counter}")
         if self.is_attacking is True and (old_state[2] == 3 or old_state[2] == 2) and (action == 1 or action == 2 or action == 3 or action == 8) and \
-                old_state[0] * 25 - current_state[0] * 25 == 0:
+                self.oNPChp - self.NPChp == 0:
             succ_dodge = 5
             ue.print_string(f"successful dodge , with action {action},#moves {self.moves_counter}")
             ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")

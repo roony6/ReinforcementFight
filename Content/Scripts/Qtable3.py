@@ -273,7 +273,7 @@ class Game:
 
         ue.print_string(f"Reward: {reward}, with action {action} ,#moves {self.moves_counter}")
 
-        if old_state[1] * 25 - current_state[1] * 25 != 0:
+        if self.oOPPhp - self.OPPhp != 0:
             self.moves_counter = 0
 
         old_state_max_q = np.max(self.q_table2[old_state])
