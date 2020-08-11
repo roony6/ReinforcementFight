@@ -28,7 +28,7 @@ class Game:
         # hit_reward = 20
         # hit_penalty = -20
         # move_penalty = -2
-        self.episodes = 2000
+        self.episodes = 1250
         self.learn_rate = 0.1
         self.discount = 0.95
         self.epsilon = 0.9
@@ -39,6 +39,10 @@ class Game:
         self.moves_counter = 0
         self.is_attacking = False
         self.name = ""
+        self.NPChp = 100
+        self.OPPhp = 100
+        self.oNPChp = 100
+        self.oOPPhp = 100
         ##self.q_table2 = np.random.uniform(low=0, high=5, size=(len(self.npc_hps), len(self.opp_hps), len(self.distances), len(self.npc_stmn), len(self.opp_stmn), len(self.actions), len(self.opponent_actions), len(self.opponent_actions), len(self.actions)))
         # print(q_table2.ndim)
         # print(q_table2.size)
@@ -80,9 +84,13 @@ class Game:
         L = cur_old_e_o_hp_dist.split(',')
         curr_npc_hp = int(L[0])
         curr_opp_hp = int(L[1])
+        self.NPChp = curr_npc_hp
+        self.OPPhp = curr_opp_hp
         curr_dist = int(L[2])
         old_npc_hp = int(L[3])
         old_opp_hp = int(L[4])
+        self.oNPChp = old_npc_hp
+        self.oOPPhp = old_opp_hp
         old_dist = int(L[5])
         # self.opp_ce_actions.append(L[6])
         if L[6] == "true":
@@ -176,7 +184,7 @@ class Game:
 
         old_state = (old_NPC_HPi, old_opp_HPi, old_distance_index, self.npc_stmn[old_npc_c_stamina], self.opp_stmn[old_opp_c_stamina], self.NPC_ce_actions[2], self.opp_ce_actions[1], self.opp_ce_actions[2])
         new_state = (new_NPC_HPi, new_opp_HPi, new_distance_index, self.npc_stmn[npc_c_stamina], self.opp_stmn[opp_c_stamina], self.NPC_ce_actions[3], self.opp_ce_actions[2], self.opp_ce_actions[3])
-        ue.print_string(f"Old State {old_state}, New State {new_state}")
+        #ue.print_string(f"Old State {old_state}, New State {new_state}")
 
         self.calc_reward(new_state, old_state)
         action = self.take_action(new_state)
@@ -208,8 +216,10 @@ class Game:
         self.move_to_q.append(np.max(self.q_table2[0, :, :, :, :, :, :, :, 0]))
         self.attack_q.append(np.min(self.q_table2[0, :, :, :, :, :, :, :, 4]))
         self.dodge_q.append(np.min(self.q_table2[0, :, :, :, :, :, :, :, 3]))
+        ue.log(f"dmg_dealt = {self.dmg_dealt} , dmg_taken = {self.dmg_taken}")
         self.d_dealt.append(self.dmg_dealt)
         self.d_taken.append(self.dmg_taken)
+        ue.log(f"damage dealt list = {self.d_dealt} \n damage taken list = {self.d_taken} \n move to q value list = {self.move_to_q}")
         self.dmg_dealt = 0
         self.dmg_taken = 0
         self.moves_counter = 0
@@ -222,20 +232,23 @@ class Game:
 
         # self.save_table(name)
 
-    def final_damage(self, d_lsit):
-        dl = d_list.split(',')
-        d_tkn = dl[0] - dl[1]
-        d_dlt = dl[2] - dl[3]
-        self.d_dealt[-1] += d_dlt
-        self.d_taken[-1] += d_tkn
+    #def final_damage(self, d_list):
+    #    dl = d_list.split(',')
+    #    d_tkn = int(dl[0]) - int(dl[1])
+    #    d_dlt = int(dl[2]) - int(dl[3])
+    #    ue.log(f"damage taken = {dl[0]} - {dl[1]} = {d_tkn} \n damage dealt = {dl[2]} - {dl[3]} = {d_dlt}")
+    #    self.d_dealt.append(d_dlt)
+    #    self.d_taken.append(d_tkn)
 
     def calc_reward(self, current_state, old_state):  # fe h5a
-        if old_state[1] * 25 - current_state[1] * 25 == 0:
+
+        if self.oOPPhp - self.OPPhp == 0:
             self.moves_counter += 1
         else:
-            self.dmg_dealt += old_state[1] * 25 - current_state[1] * 25
-        if old_state[0] * 25 - current_state[0] * 25 != 0:
-            self.dmg_taken += old_state[0] * 25 - current_state[0] * 25
+            self.dmg_dealt += self.oOPPhp - self.OPPhp
+
+        if self.oNPChp - self.NPChp != 0:
+            self.dmg_taken += self.oNPChp - self.NPChp
 
         action = self.NPC_ce_actions[3]
         succ_dodge = 0
@@ -246,11 +259,10 @@ class Game:
             ue.print_string(f"successful dodge , with action {action},#moves {self.moves_counter}")
             ue.log(f"successful dodge , with action {action},#moves {self.moves_counter}")
 
-        reward = (old_state[1] * 25 - current_state[1] * 25) - (old_state[0] * 25 - current_state[0] * 25) - (
-            self.moves_counter * 0.22) + succ_dodge
+        reward = (self.oOPPhp - self.OPPhp) - (self.oNPChp - self.NPChp) - (self.moves_counter * 0.22) + succ_dodge
         ue.print_string(f"Reward: {reward}, with action {action} ,#moves {self.moves_counter}")
 
-        if old_state[1] * 25 - current_state[1] * 25 != 0:
+        if self.oOPPhp - self.OPPhp != 0:
             self.moves_counter = 0
 
         old_state_max_q = np.max(self.q_table2[old_state])

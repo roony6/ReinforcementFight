@@ -120,8 +120,11 @@ class Game:
         self.move_to_q.append(np.max(self.q_table2[0, :, :, 0]))
         self.attack_q.append(np.min(self.q_table2[0, :, :, 4]))
         self.dodge_q.append(np.min(self.q_table2[0, :, :, 3]))
+        ue.log(f"dmg_dealt = {self.dmg_dealt} , dmg_taken = {self.dmg_taken}")
         self.d_dealt.append(self.dmg_dealt)
         self.d_taken.append(self.dmg_taken)
+        ue.log(
+            f"damage dealt list = {self.d_dealt} \n damage taken list = {self.d_taken} \n move to q value list = {self.move_to_q}")
         self.dmg_dealt = 0
         self.dmg_taken = 0
         self.moves_counter = 0
@@ -132,20 +135,21 @@ class Game:
 
     #    self.save_table(name)
 
-    def final_damage(self, d_lsit):
-        dl = d_list.split(',')
-        d_tkn = dl[0] - dl[1]
-        d_dlt = dl[2] - dl[3]
-        self.d_dealt[-1] += d_dlt
-        self.d_taken[-1] += d_tkn
+    #def final_damage(self, d_list):
+    #    dl = d_list.split(',')
+    #    d_tkn = int(dl[0]) - int(dl[1])
+    #    d_dlt = int(dl[2]) - int(dl[3])
+    #    ue.log(f"damage taken = {dl[0]} - {dl[1]} = {d_tkn} \n damage dealt = {dl[2]} - {dl[3]} = {d_dlt}")
+    #    self.d_dealt.append(d_dlt)
+    #   self.d_taken.append(d_tkn)
 
     def calc_reward(self, current_state, old_state):
         if old_state[1] * 5 - current_state[1] * 5 == 0:
             self.moves_counter += 1
         else:
-            self.dmg_dealt += old_state[1] * 25 - current_state[1] * 25
-        if old_state[0] * 25 - current_state[0] * 25 != 0:
-            self.dmg_taken += old_state[0] * 25 - current_state[0] * 25
+            self.dmg_dealt += old_state[1] * 5 - current_state[1] * 5
+        if old_state[0] * 5 - current_state[0] * 5 != 0:
+            self.dmg_taken += old_state[0] * 5 - current_state[0] * 5
 
         action = self.take_action(old_state[0], old_state[1], old_state[2])
         succ_dodge = 0
