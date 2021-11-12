@@ -2,10 +2,11 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "UnrealEnginePython",
-	"Description": "Embed a Python VM in your project",
+	"FriendlyName": "iSoftland UE_Python",
+	"Description": "Embedded a Python VM in your project, works with Blueprint/c++\n
+	This build is for python 3.6 & UnrealEngine 4.27 ",
 	"Category": "Scripting Languages",
-	"CreatedBy": "Roberto De Ioris",
+	"CreatedBy": "Mohamed Mosa & Kamal",
 	"CreatedByURL": "",
 	"DocsURL": "",
 	"MarketplaceURL": "",
@@ -17,12 +18,12 @@
   "Modules": [
     {
       "Name": "UnrealEnginePython",
-      "Type": "runtime",
+      "Type": "Runtime",
       "LoadingPhase": "Default"
     },
     {
       "Name": "PythonAutomation",
-      "Type": "runtime",
+      "Type": "Editor",
       "LoadingPhase": "PostDefault"
     },
     {
