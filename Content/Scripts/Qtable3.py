@@ -30,7 +30,7 @@ class Game:
         # hit_reward = 20
         # hit_penalty = -20
         # move_penalty = -2
-        self.episodes = 1200
+        self.episodes = 600
         self.learn_rate = 0.1
         self.discount = 0.95
         self.epsilon = 0.9
@@ -276,9 +276,9 @@ class Game:
         if self.oOPPhp - self.OPPhp != 0:
             self.moves_counter = 0
 
-        old_state_max_q = np.max(self.q_table2[old_state])
+        current_state_max_q = np.max(self.q_table2[current_state])
         current_q = self.q_table2[old_state][action]
-        new_q = round((1 - self.learn_rate) * current_q + self.learn_rate * (reward + self.discount * old_state_max_q), 2)
+        new_q = round((1 - self.learn_rate) * current_q + self.learn_rate * (reward + self.discount * current_state_max_q), 2)
         ue.log(f"Current_q {round(current_q, 4)} in state {old_state} and action {action} => New_q {round(new_q, 4)} in state {current_state}")
         ue.print_string(f"Current_q {round(current_q, 4)} in state {old_state} and action {action} => New_q {round(new_q, 4)} in state {current_state}")
         self.q_table2[old_state][action] = new_q
@@ -345,4 +345,4 @@ class Game:
             del self.q_table2
             ue.log("destructooooooooooooooooooooooooooooooooooooooooooor Table Deleted")
         except:
-            ue.log("Destructor is failed")
+            ue.log("Destructor failed")

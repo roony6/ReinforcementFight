@@ -165,7 +165,7 @@ class Game:
         if old_state[1] * 5 - current_state[1] * 5 != 0:
             self.moves_counter = 0
 
-        max_future_q = np.max(self.q_table2[old_state])
+        max_future_q = np.max(self.q_table2[current_state])
         current_q = self.q_table2[old_state][action]
         new_q = (1 - self.learn_rate) * current_q + self.learn_rate * (reward + self.discount * max_future_q)
         ue.log(f"Current_q {round(current_q, 2)} in state {old_state} and action {action} => New_q {round(new_q, 2) } in state {current_state}")
@@ -221,4 +221,4 @@ class Game:
             del self.q_table2
             ue.log("destructooooooooooooooooooooooooooooooooooooooooooor Table Deleted")
         except:
-            ue.log("Destructor is failed")
+            ue.log("Destructor failed")
